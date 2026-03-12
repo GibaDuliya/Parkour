@@ -1,0 +1,3 @@
+gamma: 0.99
+theta: 1.0e-6
+max_eval_iters: 1000
