@@ -119,7 +119,113 @@ def dijkstra(graph: dict, start: tuple, end: tuple) -> tuple:
 
 
 # ---------------------------------------------------------------------------
-# 4. Run: solve + save images
+# 4. Unit graph + min-time Dijkstra
+# ---------------------------------------------------------------------------
+
+def build_unit_graph(height_map: np.ndarray, max_jump_up: int) -> dict:
+    """Build a directed adjacency-list graph where each valid edge has weight 1.
+
+    An edge (u -> v) exists when adjacent cells satisfy:
+        height[v] - height[u] <= max_jump_up
+
+    No damage is stored — this graph is used for finding shortest paths by steps.
+
+    Args:
+        height_map: 2D array of building heights
+        max_jump_up: maximum upward height difference allowed
+
+    Returns:
+        dict mapping (i, j) -> list of (i2, j2) reachable neighbours
+    """
+    rows, cols = height_map.shape
+    deltas = [(-1, 0), (1, 0), (0, -1), (0, 1)]
+    graph: dict = {}
+
+    for i in range(rows):
+        for j in range(cols):
+            graph[(i, j)] = []
+            h = int(height_map[i, j])
+            for di, dj in deltas:
+                i2, j2 = i + di, j + dj
+                if not (0 <= i2 < rows and 0 <= j2 < cols):
+                    continue
+                if int(height_map[i2, j2]) - h > max_jump_up:
+                    continue
+                graph[(i, j)].append((i2, j2))
+
+    return graph
+
+
+def dijkstra_min_steps(
+    unit_graph: dict,
+    height_map: np.ndarray,
+    safe_jump_down: int,
+    start: tuple,
+    end: tuple,
+    hp_start: int,
+) -> tuple:
+    """Find the shortest path (min steps) with a fixed HP budget.
+
+    State is (i, j, hp_remaining). A neighbour is only enqueued when the agent
+    survives the jump (hp_remaining after damage > 0). Priority is steps only,
+    so the first time the goal cell is reached it is via the fastest route.
+
+    Args:
+        unit_graph: adjacency list from build_unit_graph
+        height_map: 2D array of building heights (used to compute damage)
+        safe_jump_down: fall distance that causes no damage
+        start: (i, j) start cell
+        end: (i, j) goal cell
+        hp_start: starting HP budget
+
+    Returns:
+        (steps, path)
+        - steps: number of moves on the optimal path
+        - path: list[(i, j)] from start to end
+        or (float('inf'), None) if end is unreachable with this HP.
+    """
+    start_state = (start[0], start[1], hp_start)
+    dist: dict = {start_state: 0}
+    prev: dict = {start_state: None}
+    heap = [(0, start_state)]  # (steps, (i, j, hp))
+
+    goal_state = None
+
+    while heap:
+        steps, u = heapq.heappop(heap)
+        if steps > dist.get(u, float("inf")):
+            continue
+        i, j, hp = u
+        if (i, j) == end:
+            goal_state = u
+            break
+        for (i2, j2) in unit_graph.get((i, j), []):
+            drop = int(height_map[i, j]) - int(height_map[i2, j2])
+            dmg = max(0, drop - safe_jump_down)
+            hp_new = hp - dmg
+            if hp_new <= 0:
+                continue  # agent dies on this jump — skip
+            next_state = (i2, j2, hp_new)
+            new_steps = steps + 1
+            if new_steps < dist.get(next_state, float("inf")):
+                dist[next_state] = new_steps
+                prev[next_state] = u
+                heapq.heappush(heap, (new_steps, next_state))
+
+    if goal_state is None:
+        return float("inf"), None
+
+    path = []
+    node = goal_state
+    while node is not None:
+        path.append((node[0], node[1]))
+        node = prev[node]
+    path.reverse()
+    return dist[goal_state], path
+
+
+# ---------------------------------------------------------------------------
+# 5. Run: solve + save images
 # ---------------------------------------------------------------------------
 
 def run_landscape(config: dict) -> None:
@@ -154,13 +260,18 @@ def run_landscape(config: dict) -> None:
     # Step 1: generate map
     height_map = generate_height_map(grid_size, min_building_height, max_building_height, seed)
 
-    # Step 2: build graph
-    graph = build_graph(height_map, max_jump_up, safe_jump_down)
-
-    # Step 3 & 4: find optimal path
     start = (0, 0)
     end = (grid_size - 1, grid_size - 1)
-    total_damage, path = dijkstra(graph, start, end)
+
+    # Step 2a: damage-optimal graph + Dijkstra
+    graph = build_graph(height_map, max_jump_up, safe_jump_down)
+    total_damage, path_damage = dijkstra(graph, start, end)
+
+    # Step 2b: unit graph + min-steps Dijkstra
+    # hp budget = min HP to survive the landscape + 1 extra
+    hp_budget = (int(total_damage) + 1) if total_damage != float("inf") else 1
+    unit_graph = build_unit_graph(height_map, max_jump_up)
+    total_steps, path_time = dijkstra_min_steps(unit_graph, height_map, safe_jump_down, start, end, hp_budget)
 
     # Save config
     with open(os.path.join(out_dir, "config.yaml"), "w") as f:
@@ -169,17 +280,19 @@ def run_landscape(config: dict) -> None:
     # Save height map data
     np.save(os.path.join(out_dir, "height_map.npy"), height_map)
 
-    # Save height map image
+    # Save images
     _save_height_map(height_map, out_dir)
+    _save_path(height_map, path_damage, total_damage, out_dir)
+    _save_min_time_path(height_map, path_time, total_steps, hp_budget, out_dir)
 
-    # Save path image
-    _save_path(height_map, path, total_damage, out_dir)
-
-    if path is None:
-        print(f"No path found from {start} to {end}.")
+    if path_damage is None:
+        print("No damage-optimal path found.")
     else:
-        print(f"Optimal path: total damage = {total_damage}, steps = {len(path) - 1}")
-        print(f"Path: {path}")
+        print(f"Min-damage path: damage={total_damage}, steps={len(path_damage) - 1}")
+    if path_time is None:
+        print(f"No time-optimal path found with hp={hp_budget}.")
+    else:
+        print(f"Min-time path:   steps={total_steps}, min HP={hp_budget}")
     print(f"Saved to: {out_dir}/")
 
 
@@ -207,6 +320,49 @@ def _save_height_map(height_map: np.ndarray, out_dir: str) -> None:
     ax.set_title("Height map")
     plt.tight_layout()
     plt.savefig(os.path.join(out_dir, "height_map.png"), dpi=150)
+    plt.close(fig)
+
+
+def _save_min_time_path(height_map: np.ndarray, path, total_steps, hp_budget, out_dir: str) -> None:
+    rows, cols = height_map.shape
+    fig, ax = plt.subplots(figsize=(6, 6))
+    im = ax.imshow(height_map, cmap="YlGnBu", aspect="equal", origin="upper", alpha=0.8)
+    plt.colorbar(im, ax=ax, label="Height")
+
+    for i in range(rows):
+        for j in range(cols):
+            ax.text(j, i, int(height_map[i, j]), ha="center", va="center",
+                    color="black", fontsize=8)
+
+    if path is not None:
+        for k in range(len(path) - 1):
+            i0, j0 = path[k]
+            i1, j1 = path[k + 1]
+            ax.annotate(
+                "",
+                xy=(j1, i1),
+                xytext=(j0, i0),
+                arrowprops=dict(arrowstyle="-|>", color="red", lw=2.0, mutation_scale=14),
+                zorder=7,
+            )
+        path_i = [p[0] for p in path]
+        path_j = [p[1] for p in path]
+        ax.scatter([path_j[0]], [path_i[0]], c="lime", s=200, marker="s", label="start", zorder=8)
+        ax.scatter([path_j[-1]], [path_i[-1]], c="gold", s=200, marker="*", label="goal", zorder=8)
+        title = f"Min-time path (steps={total_steps}, HP={hp_budget})"
+    else:
+        title = "No path found"
+
+    ax.set_xticks(np.arange(cols))
+    ax.set_yticks(np.arange(rows))
+    ax.set_xticklabels(np.arange(cols))
+    ax.set_yticklabels(np.arange(rows))
+    ax.set_xlabel("j")
+    ax.set_ylabel("i")
+    ax.set_title(title)
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.08), ncol=2, fontsize=9, frameon=True)
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir, "min_time_path.png"), dpi=150, bbox_inches="tight")
     plt.close(fig)
 
 

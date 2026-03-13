@@ -65,6 +65,11 @@ class ParkourEnv:
                         di, dj = action_delta[action]
                         i2, j2 = i + di, j + dj
 
+                        # (0) Goal -> absorbing state, no reward
+                        if (i, j) == goal and hp > 0:
+                            self.T[state][action] = (state, 0)
+                            continue
+
                         # (1) Dead -> self-loop, reward death
                         if hp <= 0:
                             self.T[state][action] = (state, rd)
