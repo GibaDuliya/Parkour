@@ -1,6 +1,7 @@
 import time
 
 import numpy as np
+from tqdm.auto import tqdm
 
 from src.algorithms.base import BaseAlgorithm
 from src.environment.parkour_env import ParkourEnv
@@ -36,7 +37,7 @@ class QLearningValueIteration(BaseAlgorithm):
         t0 = time.perf_counter()
 
         it = 0
-        while True:
+        for _ in tqdm(range(self._max_iters), desc="Q-value iteration"):
             # Q_new[s, a] = R[s, a] + gamma * max_{a'} Q[s', a']
             # where s' = next_state_ids[s, a]
             Q_next = self.Q[self.next_state_ids]  # shape (n_states, n_actions, n_actions)
@@ -49,7 +50,7 @@ class QLearningValueIteration(BaseAlgorithm):
             self.Q = Q_new
 
             it += 1
-            if delta < self._theta or it >= self._max_iters:
+            if delta < self._theta:
                 break
 
         elapsed = time.perf_counter() - t0

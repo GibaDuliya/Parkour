@@ -55,11 +55,6 @@ def plot_value_function(V: dict, height_map: np.ndarray, hp: int, save_path: str
     im = ax.imshow(grid, cmap="viridis", aspect="equal", origin="upper")
     plt.colorbar(im, ax=ax, label="V(s)")
 
-    for i in range(rows):
-        for j in range(cols):
-            if not np.isnan(grid[i, j]):
-                ax.text(j, i, f"{grid[i, j]:.1f}", ha="center", va="center", color="white", fontsize=8)
-
     ax.set_xticks(np.arange(cols))
     ax.set_yticks(np.arange(rows))
     ax.set_xlabel("j")

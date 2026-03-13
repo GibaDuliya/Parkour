@@ -1,7 +1,7 @@
 from src.environment.parkour_env import ParkourEnv
 
 
-def rollout_policy(env: ParkourEnv, policy: dict) -> dict:
+def rollout_policy(env: ParkourEnv, policy: dict, max_steps: int = 10000) -> dict:
     """Execute a policy from start state to termination.
 
     Args:
@@ -23,7 +23,7 @@ def rollout_policy(env: ParkourEnv, policy: dict) -> dict:
 
     done = False
     dead = False
-    while not done:
+    while not done and steps < max_steps:
         action = policy.get(state)
         if action is None:
             # No action defined — terminate rollout
