@@ -1,14 +1,19 @@
+from __future__ import annotations
+
+from pathlib import Path
+
 import numpy as np
 import matplotlib.pyplot as plt
 
 from src.environment.parkour_env import Action
 
 
-def plot_height_map(height_map: np.ndarray) -> None:
+def plot_height_map(height_map: np.ndarray, save_path: str | Path | None = None) -> None:
     """Plot 2D heatmap of building heights.
 
     Args:
         height_map: 8x8 array of heights
+        save_path: if set, save figure to this path before showing
     """
     fig, ax = plt.subplots()
     im = ax.imshow(height_map, cmap="terrain", aspect="equal", origin="upper")
@@ -24,16 +29,19 @@ def plot_height_map(height_map: np.ndarray) -> None:
     ax.set_xlabel("j")
     ax.set_ylabel("i")
     plt.tight_layout()
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches="tight")
     plt.show()
 
 
-def plot_value_function(V: dict, height_map: np.ndarray, hp: int) -> None:
+def plot_value_function(V: dict, height_map: np.ndarray, hp: int, save_path: str | Path | None = None) -> None:
     """Plot value function heatmap for a fixed HP level.
 
     Args:
         V: {(i, j, hp): float} value function
         height_map: 8x8 array for reference
         hp: HP level to visualize
+        save_path: if set, save figure to this path before showing
     """
     rows, cols = height_map.shape
     grid = np.full((rows, cols), np.nan)
@@ -58,16 +66,19 @@ def plot_value_function(V: dict, height_map: np.ndarray, hp: int) -> None:
     ax.set_ylabel("i")
     ax.set_title(f"Value function (hp={hp})")
     plt.tight_layout()
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches="tight")
     plt.show()
 
 
-def plot_policy(policy: dict, height_map: np.ndarray, hp: int) -> None:
+def plot_policy(policy: dict, height_map: np.ndarray, hp: int, save_path: str | Path | None = None) -> None:
     """Plot policy as arrows on the grid for a fixed HP level.
 
     Args:
         policy: {(i, j, hp): action} mapping
         height_map: 8x8 array for reference
         hp: HP level to visualize
+        save_path: if set, save figure to this path before showing
     """
     # (U, V) in (col, row): UP=row-1 -> (0,-1), DOWN=(0,1), LEFT=(-1,0), RIGHT=(1,0)
     action_uv = {
@@ -123,15 +134,18 @@ def plot_policy(policy: dict, height_map: np.ndarray, hp: int) -> None:
     ax.set_ylabel("i")
     ax.set_title(f"Policy (hp={hp})")
     plt.tight_layout()
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches="tight")
     plt.show()
 
 
-def plot_trajectory(trajectory: list, height_map: np.ndarray) -> None:
+def plot_trajectory(trajectory: list, height_map: np.ndarray, save_path: str | Path | None = None) -> None:
     """Plot agent's path on top of the height map.
 
     Args:
         trajectory: list of (state, action, reward); state is the state after the step
         height_map: 8x8 array
+        save_path: if set, save figure to this path before showing
     """
     rows, cols = height_map.shape
     # Path: start (0,0), then each state from trajectory (state after each step)
@@ -155,14 +169,17 @@ def plot_trajectory(trajectory: list, height_map: np.ndarray) -> None:
     ax.set_title("Trajectory")
     ax.legend(loc="upper left")
     plt.tight_layout()
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches="tight")
     plt.show()
 
 
-def plot_convergence(info: dict) -> None:
+def plot_convergence(info: dict, save_path: str | Path | None = None) -> None:
     """Plot convergence curve (max delta per iteration).
 
     Args:
         info: dict from algorithm.solve() containing 'delta_history'
+        save_path: if set, save figure to this path before showing
     """
     delta_history = info.get("delta_history", [])
     if not delta_history:
@@ -175,4 +192,6 @@ def plot_convergence(info: dict) -> None:
     ax.set_title("Convergence")
     ax.grid(True, alpha=0.3)
     plt.tight_layout()
+    if save_path:
+        fig.savefig(save_path, dpi=150, bbox_inches="tight")
     plt.show()

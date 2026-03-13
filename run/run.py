@@ -1,4 +1,5 @@
 import sys
+from datetime import datetime
 from pathlib import Path
 
 import yaml
@@ -64,12 +65,17 @@ def main(algorithm_name: str):
         f"victory: {rollout['victory']}"
     )
 
-    # 6. Visualization
-    plot_height_map(env.height_map)
-    plot_value_function(V, env.height_map, hp=env.hp_start)
-    plot_policy(policy, env.height_map, hp=env.hp_start)
-    plot_trajectory(rollout["trajectory"], env.height_map)
-    plot_convergence(info)
+    # 6. Visualization — save to plots/{date_time}/
+    run_date = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    out_dir = PROJECT_ROOT / "plots" / run_date
+    out_dir.mkdir(parents=True, exist_ok=True)
+    print(f"Plots will be saved to: {out_dir}")
+
+    plot_height_map(env.height_map, save_path=out_dir / "height_map.png")
+    plot_value_function(V, env.height_map, hp=env.hp_start, save_path=out_dir / "value_function.png")
+    plot_policy(policy, env.height_map, hp=env.hp_start, save_path=out_dir / "policy.png")
+    plot_trajectory(rollout["trajectory"], env.height_map, save_path=out_dir / "trajectory.png")
+    plot_convergence(info, save_path=out_dir / "convergence.png")
 
 
 if __name__ == "__main__":

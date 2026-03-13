@@ -30,4 +30,5 @@ Thumbs.db
 # Outputs / experiments
 outputs/
 results/
+plots/
 *.png
