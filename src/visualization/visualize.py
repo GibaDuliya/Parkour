@@ -34,13 +34,20 @@ def plot_height_map(height_map: np.ndarray, save_path: str | Path | None = None)
     plt.show()
 
 
-def plot_value_function(V: dict, height_map: np.ndarray, hp: int, save_path: str | Path | None = None) -> None:
+def plot_value_function(
+    V: np.ndarray,
+    height_map: np.ndarray,
+    hp: int,
+    state_to_id: dict,
+    save_path: str | Path | None = None,
+) -> None:
     """Plot value function heatmap for a fixed HP level.
 
     Args:
-        V: {(i, j, hp): float} value function
-        height_map: 8x8 array for reference
+        V: (n_states,) value function array
+        height_map: grid shape reference
         hp: HP level to visualize
+        state_to_id: state tuple -> state index
         save_path: if set, save figure to this path before showing
     """
     rows, cols = height_map.shape
@@ -48,8 +55,8 @@ def plot_value_function(V: dict, height_map: np.ndarray, hp: int, save_path: str
     for i in range(rows):
         for j in range(cols):
             state = (i, j, hp)
-            if state in V:
-                grid[i, j] = V[state]
+            if state in state_to_id:
+                grid[i, j] = V[state_to_id[state]]
 
     fig, ax = plt.subplots()
     im = ax.imshow(grid, cmap="viridis", aspect="equal", origin="upper")
@@ -66,16 +73,24 @@ def plot_value_function(V: dict, height_map: np.ndarray, hp: int, save_path: str
     plt.show()
 
 
-def plot_policy(policy: dict, height_map: np.ndarray, hp: int, save_path: str | Path | None = None) -> None:
+def plot_policy(
+    policy: np.ndarray,
+    height_map: np.ndarray,
+    hp: int,
+    state_to_id: dict,
+    actions: list,
+    save_path: str | Path | None = None,
+) -> None:
     """Plot policy as arrows on the grid for a fixed HP level.
 
     Args:
-        policy: {(i, j, hp): action} mapping
-        height_map: 8x8 array for reference
+        policy: (n_states,) array of action indices
+        height_map: grid shape reference
         hp: HP level to visualize
+        state_to_id: state tuple -> state index
+        actions: list of actions, index matches policy values
         save_path: if set, save figure to this path before showing
     """
-    # (U, V) in (col, row): UP=row-1 -> (0,-1), DOWN=(0,1), LEFT=(-1,0), RIGHT=(1,0)
     action_uv = {
         Action.UP: (0, -1),
         Action.DOWN: (0, 1),
@@ -84,17 +99,17 @@ def plot_policy(policy: dict, height_map: np.ndarray, hp: int, save_path: str | 
     }
 
     rows, cols = height_map.shape
-    # Use integer grid points as cell centers and match imshow extent,
-    # so (j, i) corresponds exactly to center of cell (i, j).
     Xc, Yc = np.meshgrid(np.arange(cols), np.arange(rows))
     xs, ys, us, vs = [], [], [], []
 
-    # Collect only cells where policy is defined, with short unit arrows
     for i in range(rows):
         for j in range(cols):
             state = (i, j, hp)
-            if state in policy:
-                u, v = action_uv[policy[state]]
+            if state in state_to_id:
+                s_id = state_to_id[state]
+                a_id = int(policy[s_id])
+                action = actions[a_id]
+                u, v = action_uv[action]
                 xs.append(Xc[i, j])
                 ys.append(Yc[i, j])
                 us.append(u * 0.4)

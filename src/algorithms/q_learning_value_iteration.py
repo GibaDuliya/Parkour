@@ -21,9 +21,7 @@ class QLearningValueIteration(BaseAlgorithm):
         self._theta: float = config["theta"]
         self._max_iters: int = config.get("max_iters", 1000)
 
-        # Derive deterministic next-state ids from transition tensor P[s, a, s']
-        self.next_state_ids = self.T_matr.argmax(axis=2)  # shape (n_states, n_actions)
-
+        # next_state_ids from base (no T_matr)
         # Q-table: shape (n_states, n_actions)
         self.Q = np.zeros((len(self.states), len(self.actions)), dtype=float)
 
@@ -60,22 +58,11 @@ class QLearningValueIteration(BaseAlgorithm):
             "time": elapsed,
         }
 
-    def get_policy(self) -> dict:
-        """Greedy policy π(s) = argmax_a Q(s, a) as {state: action}."""
-        best_action_ids = self.Q.argmax(axis=1)  # shape (n_states,)
-        policy = {}
-        for s_id, a_id in enumerate(best_action_ids):
-            state = self.states[s_id]
-            action = self.actions[a_id]
-            policy[state] = action
-        return policy
+    def get_policy(self) -> np.ndarray:
+        """Greedy policy as (n_states,) array of action indices."""
+        return self.Q.argmax(axis=1).astype(np.int32)
 
-    def get_value_function(self) -> dict:
-        """State value function V(s) = max_a Q(s, a) as {state: float}."""
-        V = self.Q.max(axis=1)
-        value_dict = {}
-        for s_id, v in enumerate(V):
-            state = self.states[s_id]
-            value_dict[state] = float(v)
-        return value_dict
+    def get_value_function(self) -> np.ndarray:
+        """State value function V(s) = max_a Q(s, a) as (n_states,) array."""
+        return self.Q.max(axis=1)
 

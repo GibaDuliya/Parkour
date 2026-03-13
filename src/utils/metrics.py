@@ -1,33 +1,41 @@
+import numpy as np
+
 from src.environment.parkour_env import ParkourEnv
 
 
-def rollout_policy(env: ParkourEnv, policy: dict, max_steps: int = 10000) -> dict:
+def rollout_policy(
+    env: ParkourEnv,
+    policy: np.ndarray,
+    states: list,
+    actions: list,
+    state_to_id: dict,
+    max_steps: int = 10000,
+) -> dict:
     """Execute a policy from start state to termination.
 
     Args:
         env: ParkourEnv instance
-        policy: {state: action} mapping
+        policy: (n_states,) array of action indices
+        states: list of state tuples, same order as policy indices
+        actions: list of actions, same order as action indices
+        state_to_id: mapping state tuple -> state index
 
     Returns:
-        dict with keys:
-            - trajectory: list of (state, action, reward)
-            - total_reward: float
-            - steps: int
-            - final_hp: int
-            - victory: bool
+        dict with keys: trajectory, total_reward, steps, final_hp, victory
     """
     state = (0, 0, env.hp_start)
     trajectory = []
     total_reward = 0.0
     steps = 0
-
     done = False
     dead = False
+
     while not done and steps < max_steps:
-        action = policy.get(state)
-        if action is None:
-            # No action defined — terminate rollout
+        s_id = state_to_id.get(state)
+        if s_id is None:
             break
+        a_id = int(policy[s_id])
+        action = actions[a_id]
         next_state, reward, done, dead = env.step(state, action)
         trajectory.append((next_state, action, reward))
         total_reward += reward
@@ -36,7 +44,6 @@ def rollout_policy(env: ParkourEnv, policy: dict, max_steps: int = 10000) -> dic
 
     final_hp = state[2]
     victory = done and not dead
-
     return {
         "trajectory": trajectory,
         "total_reward": total_reward,

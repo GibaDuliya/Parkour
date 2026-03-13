@@ -19,8 +19,10 @@ class BaseAlgorithm(ABC):
         self.states = self.env.get_all_states()
         self.actions = self.env.get_actions()
 
-        n_states = len(self.states)
-        n_actions = len(self.actions)
+        self.n_states = len(self.states)
+        self.n_actions = len(self.actions)
+        n_states = self.n_states
+        n_actions = self.n_actions
 
         # Fast mapping between state tuples and integer ids
         self._state_to_id = {s: i for i, s in enumerate(self.states)}
@@ -31,18 +33,18 @@ class BaseAlgorithm(ABC):
         random_actions = np.random.randint(0, n_actions, size=n_states)
         self.policy[np.arange(n_states), random_actions] = 1.0
 
-        self.R = np.zeros((n_states, n_actions), dtype=float)                 # R[s, a]
-        self.T_matr = np.zeros((n_states, n_actions, n_states), dtype=float)  # P[s, a, s']
+        # Reward and deterministic next-state index (no full P[s,a,s'] to save memory)
+        self.R = np.zeros((n_states, n_actions), dtype=float)
+        self.next_state_ids = np.zeros((n_states, n_actions), dtype=np.int32)
 
-        # Fill from environment transition table (deterministic)
-        T = self.env.get_transition_table()  # dict: T[state][action] -> (next_state, reward)
+        T = self.env.get_transition_table()
         for s_id, s in enumerate(self.states):
             trans = T[s]
             for a_id, a in enumerate(self.actions):
                 next_state, reward = trans[a]
                 ns_id = self.state2id(next_state)
                 self.R[s_id, a_id] = reward
-                self.T_matr[s_id, a_id, ns_id] = 1.0
+                self.next_state_ids[s_id, a_id] = ns_id
 
         
 
@@ -80,10 +82,10 @@ class BaseAlgorithm(ABC):
 
     @abstractmethod
     def get_policy(self) -> np.ndarray:
-        """Return current policy as a (n_states, n_actions) probability matrix."""
+        """Return current policy as (n_states,) array of action indices."""
         raise NotImplementedError
 
     @abstractmethod
     def get_value_function(self) -> np.ndarray:
-        """Return current value function as a (n_states,) array."""
+        """Return current value function as (n_states,) float array."""
         raise NotImplementedError

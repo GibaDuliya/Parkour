@@ -53,7 +53,9 @@ def main(algorithm_name: str):
     V = algo.get_value_function()
 
     # 5. Rollout and metrics
-    rollout = rollout_policy(env, policy)
+    rollout = rollout_policy(
+        env, policy, algo.states, algo.actions, algo._state_to_id
+    )
     stats = convergence_stats(info)
 
     print(f"Algorithm: {algorithm_name}")
@@ -73,8 +75,14 @@ def main(algorithm_name: str):
     print(f"Plots will be saved to: {out_dir}")
 
     plot_height_map(env.height_map, save_path=out_dir / "height_map.png")
-    plot_value_function(V, env.height_map, hp=env.hp_start, save_path=out_dir / "value_function.png")
-    plot_policy(policy, env.height_map, hp=env.hp_start, save_path=out_dir / "policy.png")
+    plot_value_function(
+        V, env.height_map, env.hp_start, algo._state_to_id,
+        save_path=out_dir / "value_function.png",
+    )
+    plot_policy(
+        policy, env.height_map, env.hp_start, algo._state_to_id, algo.actions,
+        save_path=out_dir / "policy.png",
+    )
     plot_trajectory(rollout["trajectory"], env.height_map, save_path=out_dir / "trajectory.png")
     plot_convergence(info, save_path=out_dir / "convergence.png")
 
