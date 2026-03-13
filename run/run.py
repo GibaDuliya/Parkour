@@ -8,7 +8,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.environment import ParkourEnv
-from src.algorithms import ValueIteration, PolicyIteration
+from src.algorithms import ValueIteration, PolicyIteration, QLearningValueIteration
 from src.utils.metrics import rollout_policy, convergence_stats
 from src.visualization.visualize import (
     plot_height_map,
@@ -21,6 +21,7 @@ from src.visualization.visualize import (
 ALGORITHMS = {
     "value_iteration": (ValueIteration, "configs/value_iteration.yaml"),
     "policy_iteration": (PolicyIteration, "configs/policy_iteration.yaml"),
+    "q_learning_value_iteration": (QLearningValueIteration, "configs/q_learning_value_iteration.yaml"),
 }
 
 

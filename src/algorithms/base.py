@@ -15,22 +15,34 @@ class BaseAlgorithm(ABC):
         self.env = env
         self.config = config
 
-        n_states  = len(self.env.get_all_states())
-        n_actions = len(self.env.get_actions())
+        # Fixed ordering of states and actions (for numpy tables)
+        self.states = self.env.get_all_states()
+        self.actions = self.env.get_actions()
+
+        n_states = len(self.states)
+        n_actions = len(self.actions)
+
+        # Fast mapping between state tuples and integer ids
+        self._state_to_id = {s: i for i, s in enumerate(self.states)}
+        self._id_to_state = list(self.states)
 
         self.V = np.zeros(n_states)
         self.policy = np.zeros((n_states, n_actions))
         random_actions = np.random.randint(0, n_actions, size=n_states)
         self.policy[np.arange(n_states), random_actions] = 1.0
 
-        self.R = np.zeros((n_states, n_actions))
-        self.T_matr = np.zeros((n_states, n_actions, n_states), dtype=int)
-        for state_id in range(n_states):
-            state = self.id2state(state_id)
-            for action in range(n_actions):
-                next_state, reward, _, _ = self.env.step(state, action)
-                self.R[state_id, action] = reward
-                self.T_matr[state_id, action, self.state2id(next_state)] = 1
+        self.R = np.zeros((n_states, n_actions), dtype=float)                 # R[s, a]
+        self.T_matr = np.zeros((n_states, n_actions, n_states), dtype=float)  # P[s, a, s']
+
+        # Fill from environment transition table (deterministic)
+        T = self.env.get_transition_table()  # dict: T[state][action] -> (next_state, reward)
+        for s_id, s in enumerate(self.states):
+            trans = T[s]
+            for a_id, a in enumerate(self.actions):
+                next_state, reward = trans[a]
+                ns_id = self.state2id(next_state)
+                self.R[s_id, a_id] = reward
+                self.T_matr[s_id, a_id, ns_id] = 1.0
 
         
 
@@ -44,8 +56,7 @@ class BaseAlgorithm(ABC):
         Returns:
             int in [0, n_states)
         """
-        i, j, hp = state
-        return i * (self.env.cols * self.env.hp_start) + j * self.env.hp_start + hp
+        return self._state_to_id[state]
 
     def id2state(self, idx: int) -> tuple:
         """Map flat integer index back to state (row, col, hp).
@@ -56,10 +67,7 @@ class BaseAlgorithm(ABC):
         Returns:
             tuple (i, j, hp)
         """
-        i  = idx // (self.env.cols * self.env.hp_start)
-        j  = (idx % (self.env.cols * self.env.hp_start)) // self.env.hp_start
-        hp = idx % self.env.hp_start
-        return (i, j, hp)
+        return self._id_to_state[idx]
 
     @abstractmethod
     def solve(self) -> dict:

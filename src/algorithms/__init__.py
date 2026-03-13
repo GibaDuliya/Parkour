@@ -1,2 +1,3 @@
 from .value_iteration import ValueIteration
 from .policy_iteration import PolicyIteration
+from .q_learning_value_iteration import QLearningValueIteration

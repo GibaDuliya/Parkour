@@ -82,9 +82,11 @@ class ParkourEnv:
                             self.T[state][action] = (state, rs)
                             continue
 
-                        # Valid move: apply fall damage
+                        # Valid move: apply fall damage and clamp HP to [0, hp_start]
                         damage = max(0, (h_ij - h_i2j2) - self.safe_jump_down)
                         hp_new = hp - damage
+                        if hp_new < 0:
+                            hp_new = 0
                         next_state = (i2, j2, hp_new)
 
                         # Reward: death before victory
