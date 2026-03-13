@@ -6,6 +6,7 @@ import sys
 import yaml
 from pathlib import Path
 
+import matplotlib.cm as _cm
 import pygame
 
 # Add project root to path
@@ -36,16 +37,15 @@ def main():
     font = pygame.font.Font(None, 28)
     font_big = pygame.font.Font(None, 42)
 
-    # Colors for heights 1..10 — приятный градиент от синего к оранжевому
+    # Colors matching YlGnBu colormap used in landscape visualizations
+    _cmap = _cm.get_cmap("YlGnBu")
+    h_min = int(env.height_map.min())
+    h_max = int(env.height_map.max())
+
     def height_color(h):
-        t = (h - 1) / 9.0
-        r = int(50 + 180 * t)
-        g = int(90 + 80 * (1 - abs(t - 0.5) * 2))
-        b = int(200 + 30 * (1 - t))
-        r = max(0, min(255, r))
-        g = max(0, min(255, g))
-        b = max(0, min(255, b))
-        return (r, g, b)
+        t = (h - h_min) / max(h_max - h_min, 1)
+        r, g, b, _ = _cmap(t)
+        return (int(r * 255), int(g * 255), int(b * 255))
 
     key_to_action = {
         pygame.K_UP: Action.UP,

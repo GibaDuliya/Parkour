@@ -1,4 +1,6 @@
+import os
 import numpy as np
+import yaml
 from enum import IntEnum
 
 
@@ -21,14 +23,22 @@ class ParkourEnv:
 
         Args:
             env_config: parsed env.yaml containing keys
-                - height_map: list[list[int]]  (8x8)
+                - landscape_id: int  — folder index under landscape/
                 - hp_start: int
                 - rewards: dict with keys 'victory', 'death', 'step'
         """
-        self.height_map: np.ndarray = np.array(env_config["height_map"])
+        landscape_id: int = env_config["landscape_id"]
+        landscape_dir = os.path.join("landscape", f"landscape_{landscape_id}")
+
+        with open(os.path.join(landscape_dir, "config.yaml")) as f:
+            landscape_cfg = yaml.safe_load(f)
+
+        self.height_map: np.ndarray = np.load(os.path.join(landscape_dir, "height_map.npy"))
         self.rows, self.cols = self.height_map.shape
         self.hp_start: int = env_config["hp_start"]
         self.rewards: dict = env_config["rewards"]
+        self.max_jump_up: int = landscape_cfg["max_jump_up"]
+        self.safe_jump_down: int = landscape_cfg["safe_jump_down"]
 
         # Build transition table: T[(i, j, hp)][action] = ((i', j', hp'), reward)
         self.T: dict = {}
@@ -65,15 +75,15 @@ class ParkourEnv:
                             self.T[state][action] = (state, rs)
                             continue
 
-                        # (3) Jump too high (Δh > 3) -> self-loop, step penalty
+                        # (3) Jump too high -> self-loop, step penalty
                         h_i2j2 = self.height_map[i2, j2]
                         dh = h_i2j2 - h_ij
-                        if dh > 3:
+                        if dh > self.max_jump_up:
                             self.T[state][action] = (state, rs)
                             continue
 
                         # Valid move: apply fall damage
-                        damage = max(0, h_ij - h_i2j2 - 1)
+                        damage = max(0, (h_ij - h_i2j2) - self.safe_jump_down)
                         hp_new = hp - damage
                         next_state = (i2, j2, hp_new)
 

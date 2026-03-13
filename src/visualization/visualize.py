@@ -16,7 +16,7 @@ def plot_height_map(height_map: np.ndarray, save_path: str | Path | None = None)
         save_path: if set, save figure to this path before showing
     """
     fig, ax = plt.subplots()
-    im = ax.imshow(height_map, cmap="terrain", aspect="equal", origin="upper")
+    im = ax.imshow(height_map, cmap="YlGnBu", aspect="equal", origin="upper")
     plt.colorbar(im, ax=ax, label="Height")
 
     rows, cols = height_map.shape
@@ -108,7 +108,7 @@ def plot_policy(policy: dict, height_map: np.ndarray, hp: int, save_path: str | 
     fig, ax = plt.subplots()
     ax.imshow(
         height_map,
-        cmap="terrain",
+        cmap="YlGnBu",
         aspect="equal",
         origin="upper",
         alpha=0.7,
@@ -156,7 +156,7 @@ def plot_trajectory(trajectory: list, height_map: np.ndarray, save_path: str | P
         path_j.append(state[1])
 
     fig, ax = plt.subplots()
-    ax.imshow(height_map, cmap="terrain", aspect="equal", origin="upper")
+    ax.imshow(height_map, cmap="YlGnBu", aspect="equal", origin="upper")
     if path_i and path_j:
         ax.plot(path_j, path_i, "r-", linewidth=2, label="path")
         ax.scatter(path_j, path_i, c="red", s=80, zorder=5)
