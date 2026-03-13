@@ -24,13 +24,13 @@ class BaseAlgorithm(ABC):
         self.policy[np.arange(n_states), random_actions] = 1.0
 
         self.R = np.zeros((n_states, n_actions))
-        self.T_matr = np.zeros((n_actions, n_states, n_states), dtype=int)
+        self.T_matr = np.zeros((n_states, n_actions, n_states), dtype=int)
         for state_id in range(n_states):
             state = self.id2state(state_id)
             for action in range(n_actions):
-                next_state, reward, _, _ = self.env.step(state, actions)
+                next_state, reward, _, _ = self.env.step(state, action)
                 self.R[state_id, action] = reward
-                self.T_matr[state_id, action, self.state2id(next_state)] = 1.0
+                self.T_matr[state_id, action, self.state2id(next_state)] = 1
 
         
 
