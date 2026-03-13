@@ -1,5 +1,10 @@
-import yaml
+import sys
 from pathlib import Path
+
+import yaml
+
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
 
 from src.environment import ParkourEnv
 from src.algorithms import ValueIteration, PolicyIteration
@@ -11,8 +16,6 @@ from src.visualization.visualize import (
     plot_trajectory,
     plot_convergence,
 )
-
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
 
 ALGORITHMS = {
     "value_iteration": (ValueIteration, "configs/value_iteration.yaml"),
@@ -45,23 +48,28 @@ def main(algorithm_name: str):
 
     # 4. Extract results
     policy = algo.get_policy()
-    #V = algo.get_value_function()
+    V = algo.get_value_function()
 
     # 5. Rollout and metrics
-    # rollout = rollout_policy(env, policy)
-    # stats = convergence_stats(info)
+    rollout = rollout_policy(env, policy)
+    stats = convergence_stats(info)
 
-    # print(f"Algorithm: {algorithm_name}")
-    # print(f"Iterations: {stats['iterations']}")
-    # print(f"Rollout steps: {rollout['steps']}, total reward: {rollout['total_reward']}")
-    # print(f"Victory: {rollout['victory']}, final HP: {rollout['final_hp']}")
+    print(f"Algorithm: {algorithm_name}")
+    print(f"Iterations: {stats['iterations']}")
+    print(f"Final delta: {stats['final_delta']}")
+    print(
+        f"Rollout steps: {rollout['steps']}, "
+        f"total reward: {rollout['total_reward']}, "
+        f"final HP: {rollout['final_hp']}, "
+        f"victory: {rollout['victory']}"
+    )
 
     # 6. Visualization
-    # plot_height_map(env.height_map)
-    # plot_value_function(V, env.height_map, hp=env.hp_start)
-    # plot_policy(policy, env.height_map, hp=env.hp_start)
-    # plot_trajectory(rollout["trajectory"], env.height_map)
-    # plot_convergence(info)
+    plot_height_map(env.height_map)
+    plot_value_function(V, env.height_map, hp=env.hp_start)
+    plot_policy(policy, env.height_map, hp=env.hp_start)
+    plot_trajectory(rollout["trajectory"], env.height_map)
+    plot_convergence(info)
 
 
 if __name__ == "__main__":

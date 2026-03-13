@@ -78,29 +78,44 @@ def plot_policy(policy: dict, height_map: np.ndarray, hp: int) -> None:
     }
 
     rows, cols = height_map.shape
-    X = np.arange(cols) + 0.5
-    Y = np.arange(rows) + 0.5
-    U = np.zeros((rows, cols))
-    V = np.zeros((rows, cols))
+    # Use integer grid points as cell centers and match imshow extent,
+    # so (j, i) corresponds exactly to center of cell (i, j).
+    Xc, Yc = np.meshgrid(np.arange(cols), np.arange(rows))
+    xs, ys, us, vs = [], [], [], []
 
+    # Collect only cells where policy is defined, with short unit arrows
     for i in range(rows):
         for j in range(cols):
             state = (i, j, hp)
             if state in policy:
                 u, v = action_uv[policy[state]]
-                U[i, j] = u
-                V[i, j] = v
+                xs.append(Xc[i, j])
+                ys.append(Yc[i, j])
+                us.append(u * 0.4)
+                vs.append(v * 0.4)
 
     fig, ax = plt.subplots()
-    ax.imshow(height_map, cmap="terrain", aspect="equal", origin="upper", alpha=0.7)
+    ax.imshow(
+        height_map,
+        cmap="terrain",
+        aspect="equal",
+        origin="upper",
+        alpha=0.7,
+        extent=[-0.5, cols - 0.5, rows - 0.5, -0.5],
+    )
     ax.quiver(
-        np.meshgrid(X, Y)[0],
-        np.meshgrid(X, Y)[1],
-        U,
-        V,
+        xs,
+        ys,
+        us,
+        vs,
         color="darkblue",
-        scale=1.0,
         scale_units="xy",
+        scale=1.0,
+        pivot="mid",
+        angles="xy",
+        width=0.012,
+        headwidth=4,
+        headlength=5,
     )
     ax.set_xticks(np.arange(cols))
     ax.set_yticks(np.arange(rows))
