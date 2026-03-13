@@ -1,4 +1,5 @@
 import yaml
+from pathlib import Path
 
 from src.environment import ParkourEnv
 from src.algorithms import ValueIteration, PolicyIteration
@@ -11,6 +12,8 @@ from src.visualization.visualize import (
     plot_convergence,
 )
 
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
 ALGORITHMS = {
     "value_iteration": (ValueIteration, "configs/value_iteration.yaml"),
     "policy_iteration": (PolicyIteration, "configs/policy_iteration.yaml"),
@@ -18,7 +21,7 @@ ALGORITHMS = {
 
 
 def load_yaml(path: str) -> dict:
-    with open(path, "r") as f:
+    with open(PROJECT_ROOT / path, "r") as f:
         return yaml.safe_load(f)
 
 
