@@ -1,0 +1,997 @@
+{
+  "theta": 0.2,
+  "gamma": 0.99,
+  "n_maps": 1,
+  "results": [
+    {
+      "grid_size": 2,
+      "n_states": 20,
+      "min_damage": 3.0,
+      "hp_start": 4,
+      "time_vi": 0.017059790989151224,
+      "time_pi": 0.005742625013226643,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 3,
+      "n_states": 27,
+      "min_damage": 1.0,
+      "hp_start": 2,
+      "time_vi": 0.0063675830024294555,
+      "time_pi": 0.007525334018282592,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 4,
+      "n_states": 112,
+      "min_damage": 5.0,
+      "hp_start": 6,
+      "time_vi": 0.008296667016111314,
+      "time_pi": 0.008654292003484443,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 5,
+      "n_states": 225,
+      "min_damage": 7.0,
+      "hp_start": 8,
+      "time_vi": 0.00798537500668317,
+      "time_pi": 0.006396874989150092,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 6,
+      "n_states": 252,
+      "min_damage": 5.0,
+      "hp_start": 6,
+      "time_vi": 0.008185540995327756,
+      "time_pi": 0.006869542005006224,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 7,
+      "n_states": 343,
+      "min_damage": 5.0,
+      "hp_start": 6,
+      "time_vi": 0.010028833989053965,
+      "time_pi": 0.006149541994091123,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 8,
+      "n_states": 512,
+      "min_damage": 6.0,
+      "hp_start": 7,
+      "time_vi": 0.011352625006111339,
+      "time_pi": 0.007752333011012524,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 9,
+      "n_states": 1053,
+      "min_damage": 11.0,
+      "hp_start": 12,
+      "time_vi": 0.01900816598208621,
+      "time_pi": 0.009634666988858953,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 10,
+      "n_states": 1600,
+      "min_damage": 14.0,
+      "hp_start": 15,
+      "time_vi": 0.026013624999905005,
+      "time_pi": 0.01351054199039936,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 11,
+      "n_states": 1210,
+      "min_damage": 8.0,
+      "hp_start": 9,
+      "time_vi": 0.021367334004025906,
+      "time_pi": 0.015455124987056479,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 12,
+      "n_states": 1584,
+      "min_damage": 9.0,
+      "hp_start": 10,
+      "time_vi": 0.025495582987787202,
+      "time_pi": 0.01816987499478273,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 13,
+      "n_states": 2366,
+      "min_damage": 12.0,
+      "hp_start": 13,
+      "time_vi": 0.05441424998571165,
+      "time_pi": 0.01970470798551105,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 14,
+      "n_states": 2156,
+      "min_damage": 9.0,
+      "hp_start": 10,
+      "time_vi": 0.039453874982427806,
+      "time_pi": 0.026291083020623773,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 15,
+      "n_states": 2025,
+      "min_damage": 7.0,
+      "hp_start": 8,
+      "time_vi": 0.03714029199909419,
+      "time_pi": 0.02136133299791254,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 16,
+      "n_states": 3584,
+      "min_damage": 12.0,
+      "hp_start": 13,
+      "time_vi": 0.048682708002161235,
+      "time_pi": 0.3654835829802323,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 17,
+      "n_states": 4335,
+      "min_damage": 13.0,
+      "hp_start": 14,
+      "time_vi": 0.061037125007715076,
+      "time_pi": 0.049260333995334804,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 18,
+      "n_states": 4212,
+      "min_damage": 11.0,
+      "hp_start": 12,
+      "time_vi": 0.05827612499706447,
+      "time_pi": 0.04708216601284221,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 19,
+      "n_states": 6498,
+      "min_damage": 16.0,
+      "hp_start": 17,
+      "time_vi": 0.08113462498295121,
+      "time_pi": 0.06138041699887253,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 20,
+      "n_states": 8000,
+      "min_damage": 18.0,
+      "hp_start": 19,
+      "time_vi": 0.09762849999242462,
+      "time_pi": 0.06773212499683723,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 21,
+      "n_states": 3969,
+      "min_damage": 7.0,
+      "hp_start": 8,
+      "time_vi": 0.06455416700919159,
+      "time_pi": 0.04654841701267287,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 22,
+      "n_states": 9680,
+      "min_damage": 18.0,
+      "hp_start": 19,
+      "time_vi": 0.12073975001112558,
+      "time_pi": 0.08615824999287724,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 23,
+      "n_states": 7935,
+      "min_damage": 13.0,
+      "hp_start": 14,
+      "time_vi": 0.10224733300856315,
+      "time_pi": 0.7321324170043226,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 24,
+      "n_states": 9792,
+      "min_damage": 15.0,
+      "hp_start": 16,
+      "time_vi": 0.11827962502138689,
+      "time_pi": 0.08884333400055766,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 25,
+      "n_states": 12500,
+      "min_damage": 18.0,
+      "hp_start": 19,
+      "time_vi": 0.1484773340052925,
+      "time_pi": 0.9457590410020202,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 26,
+      "n_states": 12168,
+      "min_damage": 16.0,
+      "hp_start": 17,
+      "time_vi": 0.16072020897991024,
+      "time_pi": 0.13854687500861473,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 27,
+      "n_states": 13122,
+      "min_damage": 16.0,
+      "hp_start": 17,
+      "time_vi": 0.15682733300491236,
+      "time_pi": 0.14741224999306723,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 28,
+      "n_states": 19600,
+      "min_damage": 23.0,
+      "hp_start": 24,
+      "time_vi": 0.2267893750104122,
+      "time_pi": 0.16025887499563396,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 29,
+      "n_states": 20184,
+      "min_damage": 22.0,
+      "hp_start": 23,
+      "time_vi": 0.23726937497849576,
+      "time_pi": 0.17285454101511277,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 30,
+      "n_states": 26100,
+      "min_damage": 27.0,
+      "hp_start": 28,
+      "time_vi": 0.30568391698761843,
+      "time_pi": 0.19923354202182963,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 31,
+      "n_states": 25947,
+      "min_damage": 25.0,
+      "hp_start": 26,
+      "time_vi": 0.7340869999898132,
+      "time_pi": 0.3441436249995604,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 32,
+      "n_states": 23552,
+      "min_damage": 21.0,
+      "hp_start": 22,
+      "time_vi": 0.2916384999989532,
+      "time_pi": 0.21860037499573082,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 33,
+      "n_states": 28314,
+      "min_damage": 24.0,
+      "hp_start": 25,
+      "time_vi": 0.34324033302254975,
+      "time_pi": 1.913530041987542,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 34,
+      "n_states": 27744,
+      "min_damage": 22.0,
+      "hp_start": 23,
+      "time_vi": 0.33181387500371784,
+      "time_pi": 1.9260945419955533,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 35,
+      "n_states": 25725,
+      "min_damage": 19.0,
+      "hp_start": 20,
+      "time_vi": 0.3109225000080187,
+      "time_pi": 1.8023153340036515,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 36,
+      "n_states": 36288,
+      "min_damage": 26.0,
+      "hp_start": 27,
+      "time_vi": 0.4305805000185501,
+      "time_pi": 2.337314875010634,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 37,
+      "n_states": 46546,
+      "min_damage": 32.0,
+      "hp_start": 33,
+      "time_vi": 0.5454549999849405,
+      "time_pi": 3.077814291988034,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 38,
+      "n_states": 27436,
+      "min_damage": 17.0,
+      "hp_start": 18,
+      "time_vi": 0.3270670420024544,
+      "time_pi": 0.23773120899568312,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 39,
+      "n_states": 36504,
+      "min_damage": 22.0,
+      "hp_start": 23,
+      "time_vi": 0.4333489160053432,
+      "time_pi": 0.3066969999927096,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 40,
+      "n_states": 36800,
+      "min_damage": 21.0,
+      "hp_start": 22,
+      "time_vi": 0.43109729199204594,
+      "time_pi": 1.996133375010686,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 41,
+      "n_states": 47068,
+      "min_damage": 26.0,
+      "hp_start": 27,
+      "time_vi": 0.549616625008639,
+      "time_pi": 3.1137707919988316,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 42,
+      "n_states": 38808,
+      "min_damage": 20.0,
+      "hp_start": 21,
+      "time_vi": 0.45556450000731274,
+      "time_pi": 0.3586999580147676,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 43,
+      "n_states": 44376,
+      "min_damage": 22.0,
+      "hp_start": 23,
+      "time_vi": 0.52407383301761,
+      "time_pi": 0.38184595899656415,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 44,
+      "n_states": 46464,
+      "min_damage": 22.0,
+      "hp_start": 23,
+      "time_vi": 0.5876111249963287,
+      "time_pi": 0.4519014170218725,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 45,
+      "n_states": 58725,
+      "min_damage": 27.0,
+      "hp_start": 28,
+      "time_vi": 0.6930606669920962,
+      "time_pi": 2.8484937500033993,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 46,
+      "n_states": 63480,
+      "min_damage": 28.0,
+      "hp_start": 29,
+      "time_vi": 0.7532594999938738,
+      "time_pi": 0.6337572500051465,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 47,
+      "n_states": 68479,
+      "min_damage": 29.0,
+      "hp_start": 30,
+      "time_vi": 0.8132204579887912,
+      "time_pi": 4.477278042002581,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 48,
+      "n_states": 57600,
+      "min_damage": 23.0,
+      "hp_start": 24,
+      "time_vi": 0.6740970420069061,
+      "time_pi": 3.6264729580143467,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 49,
+      "n_states": 60025,
+      "min_damage": 23.0,
+      "hp_start": 24,
+      "time_vi": 0.7006394169875421,
+      "time_pi": 0.6966930420021527,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 50,
+      "n_states": 77500,
+      "min_damage": 29.0,
+      "hp_start": 30,
+      "time_vi": 0.9175896669912618,
+      "time_pi": 5.141241917008301,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 51,
+      "n_states": 52020,
+      "min_damage": 18.0,
+      "hp_start": 19,
+      "time_vi": 0.6062752920261119,
+      "time_pi": 0.48527137498604134,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 52,
+      "n_states": 89232,
+      "min_damage": 31.0,
+      "hp_start": 32,
+      "time_vi": 1.0591109170054551,
+      "time_pi": 5.728398584004026,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 53,
+      "n_states": 87079,
+      "min_damage": 29.0,
+      "hp_start": 30,
+      "time_vi": 1.0439624580030795,
+      "time_pi": 0.8811216249887366,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 54,
+      "n_states": 104976,
+      "min_damage": 34.0,
+      "hp_start": 35,
+      "time_vi": 1.268483958003344,
+      "time_pi": 0.9844273329945281,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 55,
+      "n_states": 111925,
+      "min_damage": 35.0,
+      "hp_start": 36,
+      "time_vi": 1.3376934580155648,
+      "time_pi": 7.08988483302528,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 56,
+      "n_states": 116032,
+      "min_damage": 35.0,
+      "hp_start": 36,
+      "time_vi": 1.7425701669999398,
+      "time_pi": 7.316970084008062,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 57,
+      "n_states": 110466,
+      "min_damage": 32.0,
+      "hp_start": 33,
+      "time_vi": 1.3445707500213757,
+      "time_pi": 5.927713084005518,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 58,
+      "n_states": 111012,
+      "min_damage": 31.0,
+      "hp_start": 32,
+      "time_vi": 1.359071209008107,
+      "time_pi": 6.669288500008406,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 59,
+      "n_states": 107911,
+      "min_damage": 29.0,
+      "hp_start": 30,
+      "time_vi": 1.2642402079945896,
+      "time_pi": 1.1455624169902876,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 60,
+      "n_states": 104400,
+      "min_damage": 27.0,
+      "hp_start": 28,
+      "time_vi": 1.2062007499916945,
+      "time_pi": 6.214608957991004,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 61,
+      "n_states": 141398,
+      "min_damage": 36.0,
+      "hp_start": 37,
+      "time_vi": 1.7114502920012455,
+      "time_pi": 1.4385660410043783,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 62,
+      "n_states": 134540,
+      "min_damage": 33.0,
+      "hp_start": 34,
+      "time_vi": 1.5514405830181204,
+      "time_pi": 10.25695591699332,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 63,
+      "n_states": 194481,
+      "min_damage": 47.0,
+      "hp_start": 48,
+      "time_vi": 2.3038423329999205,
+      "time_pi": 11.868526458012639,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 64,
+      "n_states": 180224,
+      "min_damage": 42.0,
+      "hp_start": 43,
+      "time_vi": 2.274091375002172,
+      "time_pi": 7.082189875014592,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 65,
+      "n_states": 130975,
+      "min_damage": 29.0,
+      "hp_start": 30,
+      "time_vi": 1.5818437910056673,
+      "time_pi": 1.5283117499784566,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 66,
+      "n_states": 152460,
+      "min_damage": 33.0,
+      "hp_start": 34,
+      "time_vi": 1.7738397079810966,
+      "time_pi": 1.61875029100338,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 67,
+      "n_states": 210983,
+      "min_damage": 45.0,
+      "hp_start": 46,
+      "time_vi": 2.591308916977141,
+      "time_pi": 9.415922665997641,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 68,
+      "n_states": 189584,
+      "min_damage": 39.0,
+      "hp_start": 40,
+      "time_vi": 2.3745780419849325,
+      "time_pi": 2.1905354159825947,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 69,
+      "n_states": 176157,
+      "min_damage": 35.0,
+      "hp_start": 36,
+      "time_vi": 2.206375542009482,
+      "time_pi": 2.4108703329984564,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 70,
+      "n_states": 196000,
+      "min_damage": 38.0,
+      "hp_start": 39,
+      "time_vi": 2.4554397499887273,
+      "time_pi": 2.27727274998324,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 71,
+      "n_states": 181476,
+      "min_damage": 34.0,
+      "hp_start": 35,
+      "time_vi": 2.2437339999887627,
+      "time_pi": 8.088595625013113,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 72,
+      "n_states": 212544,
+      "min_damage": 39.0,
+      "hp_start": 40,
+      "time_vi": 2.738408540986711,
+      "time_pi": 10.16116829100065,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 73,
+      "n_states": 223818,
+      "min_damage": 40.0,
+      "hp_start": 41,
+      "time_vi": 3.021247917000437,
+      "time_pi": 2.7501120830129366,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 74,
+      "n_states": 213564,
+      "min_damage": 37.0,
+      "hp_start": 38,
+      "time_vi": 2.570012250012951,
+      "time_pi": 2.352132416010136,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 75,
+      "n_states": 270000,
+      "min_damage": 46.0,
+      "hp_start": 47,
+      "time_vi": 3.267664084007265,
+      "time_pi": 3.3132105839904398,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 76,
+      "n_states": 277248,
+      "min_damage": 46.0,
+      "hp_start": 47,
+      "time_vi": 3.5016371670062654,
+      "time_pi": 16.458772000012686,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 77,
+      "n_states": 272734,
+      "min_damage": 44.0,
+      "hp_start": 45,
+      "time_vi": 3.650719333003508,
+      "time_pi": 4.129233209008817,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 78,
+      "n_states": 292032,
+      "min_damage": 46.0,
+      "hp_start": 47,
+      "time_vi": 3.725841583975125,
+      "time_pi": 19.75696366597549,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 79,
+      "n_states": 268363,
+      "min_damage": 41.0,
+      "hp_start": 42,
+      "time_vi": 3.5981132500164676,
+      "time_pi": 14.274919207993662,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 80,
+      "n_states": 243200,
+      "min_damage": 36.0,
+      "hp_start": 37,
+      "time_vi": 2.9700025409983937,
+      "time_pi": 3.0666239999991376,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 81,
+      "n_states": 314928,
+      "min_damage": 46.0,
+      "hp_start": 47,
+      "time_vi": 4.2715445419889875,
+      "time_pi": 23.133120083017275,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 82,
+      "n_states": 336200,
+      "min_damage": 48.0,
+      "hp_start": 49,
+      "time_vi": 4.633281458023703,
+      "time_pi": 17.965016166010173,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 83,
+      "n_states": 330672,
+      "min_damage": 46.0,
+      "hp_start": 47,
+      "time_vi": 4.258019457978662,
+      "time_pi": 4.238562249985989,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 84,
+      "n_states": 345744,
+      "min_damage": 47.0,
+      "hp_start": 48,
+      "time_vi": 4.317680833017221,
+      "time_pi": 4.969765500020003,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 85,
+      "n_states": 375700,
+      "min_damage": 50.0,
+      "hp_start": 51,
+      "time_vi": 4.676140374998795,
+      "time_pi": 5.974415375007084,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 86,
+      "n_states": 258860,
+      "min_damage": 33.0,
+      "hp_start": 34,
+      "time_vi": 3.3181786249915604,
+      "time_pi": 4.674483542010421,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 87,
+      "n_states": 423864,
+      "min_damage": 54.0,
+      "hp_start": 55,
+      "time_vi": 5.250206333003007,
+      "time_pi": 23.121458583016647,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 88,
+      "n_states": 402688,
+      "min_damage": 50.0,
+      "hp_start": 51,
+      "time_vi": 5.0796196250012144,
+      "time_pi": 6.31099504197482,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 89,
+      "n_states": 388129,
+      "min_damage": 47.0,
+      "hp_start": 48,
+      "time_vi": 4.742146374977892,
+      "time_pi": 10.855232875008369,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 90,
+      "n_states": 486000,
+      "min_damage": 58.0,
+      "hp_start": 59,
+      "time_vi": 5.9574111250112765,
+      "time_pi": 7.130597875016974,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 91,
+      "n_states": 414050,
+      "min_damage": 48.0,
+      "hp_start": 49,
+      "time_vi": 5.03063850000035,
+      "time_pi": 6.156132917007199,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 92,
+      "n_states": 482448,
+      "min_damage": 55.0,
+      "hp_start": 56,
+      "time_vi": 5.898235540982569,
+      "time_pi": 24.86789999998291,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 93,
+      "n_states": 518940,
+      "min_damage": 58.0,
+      "hp_start": 59,
+      "time_vi": 6.442938334017526,
+      "time_pi": 25.50371254098718,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 94,
+      "n_states": 415292,
+      "min_damage": 45.0,
+      "hp_start": 46,
+      "time_vi": 5.042641792009817,
+      "time_pi": 6.053768165991642,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 95,
+      "n_states": 496375,
+      "min_damage": 53.0,
+      "hp_start": 54,
+      "time_vi": 6.651135416002944,
+      "time_pi": 24.602806624985533,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 96,
+      "n_states": 525312,
+      "min_damage": 55.0,
+      "hp_start": 56,
+      "time_vi": 6.873199374997057,
+      "time_pi": 8.697354291012743,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 97,
+      "n_states": 470450,
+      "min_damage": 48.0,
+      "hp_start": 49,
+      "time_vi": 6.114835749991471,
+      "time_pi": 9.130113999999594,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 98,
+      "n_states": 557032,
+      "min_damage": 56.0,
+      "hp_start": 57,
+      "time_vi": 7.403114207991166,
+      "time_pi": 26.66858433300513,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 99,
+      "n_states": 548856,
+      "min_damage": 54.0,
+      "hp_start": 55,
+      "time_vi": 7.313462083984632,
+      "time_pi": 16.659956959018018,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    },
+    {
+      "grid_size": 100,
+      "n_states": 540000,
+      "min_damage": 52.0,
+      "hp_start": 53,
+      "time_vi": 7.361949999991339,
+      "time_pi": 10.84604470798513,
+      "time_vi_std": 0.0,
+      "time_pi_std": 0.0
+    }
+  ]
+}

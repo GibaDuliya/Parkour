@@ -22,23 +22,28 @@ class ParkourEnv:
         """Initialize environment from config dict.
 
         Args:
-            env_config: parsed env.yaml containing keys
-                - landscape_id: int  — folder index under landscape/
-                - hp_start: int
-                - rewards: dict with keys 'victory', 'death', 'step'
+            env_config: either
+                - landscape_id: int, hp_start, rewards — load height_map from landscape/landscape_{id}/
+                - or height_map, hp_start, rewards, max_jump_up, safe_jump_down — inline (for experiments)
         """
-        landscape_id: int = env_config["landscape_id"]
-        landscape_dir = os.path.join("landscape", f"landscape_{landscape_id}")
-
-        with open(os.path.join(landscape_dir, "config.yaml")) as f:
-            landscape_cfg = yaml.safe_load(f)
-
-        self.height_map: np.ndarray = np.load(os.path.join(landscape_dir, "height_map.npy"))
-        self.rows, self.cols = self.height_map.shape
-        self.hp_start: int = env_config["hp_start"]
-        self.rewards: dict = env_config["rewards"]
-        self.max_jump_up: int = landscape_cfg["max_jump_up"]
-        self.safe_jump_down: int = landscape_cfg["safe_jump_down"]
+        if "height_map" in env_config:
+            self.height_map = np.array(env_config["height_map"])
+            self.rows, self.cols = self.height_map.shape
+            self.hp_start = int(env_config["hp_start"])
+            self.rewards = env_config["rewards"]
+            self.max_jump_up = int(env_config["max_jump_up"])
+            self.safe_jump_down = int(env_config["safe_jump_down"])
+        else:
+            landscape_id: int = env_config["landscape_id"]
+            landscape_dir = os.path.join("landscape", f"landscape_{landscape_id}")
+            with open(os.path.join(landscape_dir, "config.yaml")) as f:
+                landscape_cfg = yaml.safe_load(f)
+            self.height_map = np.load(os.path.join(landscape_dir, "height_map.npy"))
+            self.rows, self.cols = self.height_map.shape
+            self.hp_start = int(env_config["hp_start"])
+            self.rewards = env_config["rewards"]
+            self.max_jump_up = int(landscape_cfg["max_jump_up"])
+            self.safe_jump_down = int(landscape_cfg["safe_jump_down"])
 
         # Build transition table: T[(i, j, hp)][action] = ((i', j', hp'), reward)
         self.T: dict = {}
