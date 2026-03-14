@@ -1,6 +1,7 @@
 import time
 
 import numpy as np
+from tqdm import tqdm
 
 from src.algorithms.base import BaseAlgorithm
 from src.environment.parkour_env import ParkourEnv
@@ -20,13 +21,16 @@ class PolicyIteration(BaseAlgorithm):
     def solve(self) -> dict:
         delta_history = []
         t0 = time.perf_counter()
-        while True:
-            self._policy_evaluation()
-            policy_new, delta = self._policy_improvement()
-            delta_history.append(delta)
-            if np.array_equal(policy_new, self._policy):
-                break
-            self._policy = policy_new
+        with tqdm() as pbar:
+            while True:
+                self._policy_evaluation()
+                policy_new, delta = self._policy_improvement()
+                delta_history.append(delta)
+                pbar.update(1)
+                pbar.set_postfix(delta=f"{delta:.2e}")
+                if np.array_equal(policy_new, self._policy):
+                    break
+                self._policy = policy_new
         return {
             "iterations": len(delta_history),
             "delta_history": delta_history,

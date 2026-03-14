@@ -4,6 +4,7 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 import yaml
+from tqdm import tqdm
 
 
 # ---------------------------------------------------------------------------
@@ -119,7 +120,59 @@ def dijkstra(graph: dict, start: tuple, end: tuple) -> tuple:
 
 
 # ---------------------------------------------------------------------------
-# 4. Unit graph + min-time Dijkstra
+# 4. Min-HP map
+# ---------------------------------------------------------------------------
+
+def compute_min_hp_map(graph: dict, height_map: np.ndarray, goal: tuple) -> np.ndarray:
+    """Compute minimum starting HP required at each cell to reach the goal.
+
+    Builds a reversed graph and runs Dijkstra from the goal.
+    min_hp[i, j] = min_damage_on_path_(i,j)->goal + 1.
+    Unreachable cells get value -1.
+
+    Args:
+        graph: adjacency list from build_graph — dict[(i,j)] -> [((i2,j2), damage)]
+        height_map: 2D array of building heights
+        goal: (i, j) goal cell
+
+    Returns:
+        np.ndarray of shape (rows, cols) with dtype int
+    """
+    rows, cols = height_map.shape
+    n_cells = rows * cols
+
+    # Build reversed graph: for each edge u->v with weight w, add v->u with weight w
+    rev_graph: dict = {(i, j): [] for i in range(rows) for j in range(cols)}
+    for u, neighbours in graph.items():
+        for v, w in neighbours:
+            rev_graph[v].append((u, w))
+
+    dist = {goal: 0}
+    heap = [(0, goal)]
+
+    with tqdm(total=n_cells, desc="min_hp map") as pbar:
+        while heap:
+            d, u = heapq.heappop(heap)
+            if d > dist.get(u, float("inf")):
+                continue
+            pbar.update(1)
+            for v, w in rev_graph.get(u, []):
+                nd = d + w
+                if nd < dist.get(v, float("inf")):
+                    dist[v] = nd
+                    heapq.heappush(heap, (nd, v))
+
+    min_hp_map = np.full((rows, cols), -1, dtype=int)
+    for i in range(rows):
+        for j in range(cols):
+            if (i, j) in dist:
+                min_hp_map[i, j] = int(dist[(i, j)]) + 1
+
+    return min_hp_map
+
+
+# ---------------------------------------------------------------------------
+# 5. Unit graph + min-time Dijkstra
 # ---------------------------------------------------------------------------
 
 def build_unit_graph(height_map: np.ndarray, max_jump_up: int) -> dict:
@@ -267,8 +320,10 @@ def run_landscape(config: dict) -> None:
     graph = build_graph(height_map, max_jump_up, safe_jump_down)
     total_damage, path_damage = dijkstra(graph, start, end)
 
-    # Step 2b: unit graph + min-steps Dijkstra
-    # hp budget = min HP to survive the landscape + 1 extra
+    # Step 2b: min-HP map for every cell (min starting HP at that cell to reach goal)
+    min_hp_map = compute_min_hp_map(graph, height_map, end)
+
+    # Step 2c: unit graph + min-steps Dijkstra with landscape min HP
     hp_budget = (int(total_damage) + 1) if total_damage != float("inf") else 1
     unit_graph = build_unit_graph(height_map, max_jump_up)
     total_steps, path_time = dijkstra_min_steps(unit_graph, height_map, safe_jump_down, start, end, hp_budget)
@@ -277,13 +332,15 @@ def run_landscape(config: dict) -> None:
     with open(os.path.join(out_dir, "config.yaml"), "w") as f:
         yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
 
-    # Save height map data
+    # Save arrays
     np.save(os.path.join(out_dir, "height_map.npy"), height_map)
+    np.save(os.path.join(out_dir, "min_hp.npy"), min_hp_map)
 
     # Save images
     _save_height_map(height_map, out_dir)
-    _save_path(height_map, path_damage, total_damage, out_dir)
+    _save_path(height_map, path_damage, total_damage, out_dir)  # -> optimal_hp_path.png
     _save_min_time_path(height_map, path_time, total_steps, hp_budget, out_dir)
+    _save_min_hp_map(min_hp_map, out_dir)
 
     if path_damage is None:
         print("No damage-optimal path found.")
@@ -300,26 +357,63 @@ def run_landscape(config: dict) -> None:
 # Internal helpers
 # ---------------------------------------------------------------------------
 
+_MAX_TICKS = 20
+_MAX_CELL_LABELS = 20  # hide per-cell numbers above this grid size
+
+
+def _set_ticks(ax, rows: int, cols: int) -> None:
+    x_step = max(1, cols // _MAX_TICKS)
+    y_step = max(1, rows // _MAX_TICKS)
+    ax.set_xticks(np.arange(0, cols, x_step))
+    ax.set_yticks(np.arange(0, rows, y_step))
+    ax.set_xticklabels(np.arange(0, cols, x_step))
+    ax.set_yticklabels(np.arange(0, rows, y_step))
+
+
 def _save_height_map(height_map: np.ndarray, out_dir: str) -> None:
     rows, cols = height_map.shape
     fig, ax = plt.subplots(figsize=(6, 6))
     im = ax.imshow(height_map, cmap="YlGnBu", aspect="equal", origin="upper", alpha=0.8)
     plt.colorbar(im, ax=ax, label="Height")
 
-    for i in range(rows):
-        for j in range(cols):
-            ax.text(j, i, int(height_map[i, j]), ha="center", va="center",
-                    color="black", fontsize=10)
+    if rows <= _MAX_CELL_LABELS and cols <= _MAX_CELL_LABELS:
+        for i in range(rows):
+            for j in range(cols):
+                ax.text(j, i, int(height_map[i, j]), ha="center", va="center",
+                        color="black", fontsize=10)
 
-    ax.set_xticks(np.arange(cols))
-    ax.set_yticks(np.arange(rows))
-    ax.set_xticklabels(np.arange(cols))
-    ax.set_yticklabels(np.arange(rows))
+    _set_ticks(ax, rows, cols)
     ax.set_xlabel("j")
     ax.set_ylabel("i")
     ax.set_title("Height map")
     plt.tight_layout()
     plt.savefig(os.path.join(out_dir, "height_map.png"), dpi=150)
+    plt.close(fig)
+
+
+def _save_min_hp_map(min_hp_map: np.ndarray, out_dir: str) -> None:
+    rows, cols = min_hp_map.shape
+    display = min_hp_map.astype(float)
+    display[display < 0] = np.nan  # unreachable cells
+
+    fig, ax = plt.subplots(figsize=(6, 6))
+    im = ax.imshow(display, cmap="YlGnBu", aspect="equal", origin="upper")
+    plt.colorbar(im, ax=ax, label="Min HP to reach")
+
+    # Auto-skip tick labels to avoid overlap
+    max_ticks = 20
+    x_step = max(1, cols // max_ticks)
+    y_step = max(1, rows // max_ticks)
+    ax.set_xticks(np.arange(0, cols, x_step))
+    ax.set_yticks(np.arange(0, rows, y_step))
+    ax.set_xticklabels(np.arange(0, cols, x_step))
+    ax.set_yticklabels(np.arange(0, rows, y_step))
+
+    ax.set_xlabel("j")
+    ax.set_ylabel("i")
+    ax.set_title("Min HP per cell")
+    plt.tight_layout()
+    plt.savefig(os.path.join(out_dir, "min_hp.png"), dpi=150)
     plt.close(fig)
 
 
@@ -329,34 +423,23 @@ def _save_min_time_path(height_map: np.ndarray, path, total_steps, hp_budget, ou
     im = ax.imshow(height_map, cmap="YlGnBu", aspect="equal", origin="upper", alpha=0.8)
     plt.colorbar(im, ax=ax, label="Height")
 
-    for i in range(rows):
-        for j in range(cols):
-            ax.text(j, i, int(height_map[i, j]), ha="center", va="center",
-                    color="black", fontsize=8)
+    if rows <= _MAX_CELL_LABELS and cols <= _MAX_CELL_LABELS:
+        for i in range(rows):
+            for j in range(cols):
+                ax.text(j, i, int(height_map[i, j]), ha="center", va="center",
+                        color="black", fontsize=8)
 
     if path is not None:
-        for k in range(len(path) - 1):
-            i0, j0 = path[k]
-            i1, j1 = path[k + 1]
-            ax.annotate(
-                "",
-                xy=(j1, i1),
-                xytext=(j0, i0),
-                arrowprops=dict(arrowstyle="-|>", color="red", lw=2.0, mutation_scale=14),
-                zorder=7,
-            )
         path_i = [p[0] for p in path]
         path_j = [p[1] for p in path]
+        ax.plot(path_j, path_i, "-", color="red", linewidth=2, zorder=7)
         ax.scatter([path_j[0]], [path_i[0]], c="lime", s=200, marker="s", label="start", zorder=8)
         ax.scatter([path_j[-1]], [path_i[-1]], c="gold", s=200, marker="*", label="goal", zorder=8)
         title = f"Min-time path (steps={total_steps}, HP={hp_budget})"
     else:
         title = "No path found"
 
-    ax.set_xticks(np.arange(cols))
-    ax.set_yticks(np.arange(rows))
-    ax.set_xticklabels(np.arange(cols))
-    ax.set_yticklabels(np.arange(rows))
+    _set_ticks(ax, rows, cols)
     ax.set_xlabel("j")
     ax.set_ylabel("i")
     ax.set_title(title)
@@ -372,45 +455,25 @@ def _save_path(height_map: np.ndarray, path, total_damage, out_dir: str) -> None
     im = ax.imshow(height_map, cmap="YlGnBu", aspect="equal", origin="upper", alpha=0.8)
     plt.colorbar(im, ax=ax, label="Height")
 
-    # Height values as text
-    for i in range(rows):
-        for j in range(cols):
-            ax.text(j, i, int(height_map[i, j]), ha="center", va="center",
-                    color="black", fontsize=8)
+    if rows <= _MAX_CELL_LABELS and cols <= _MAX_CELL_LABELS:
+        for i in range(rows):
+            for j in range(cols):
+                ax.text(j, i, int(height_map[i, j]), ha="center", va="center",
+                        color="black", fontsize=8)
 
     if path is not None:
-        # Draw red arrows between consecutive cells
-        for k in range(len(path) - 1):
-            i0, j0 = path[k]
-            i1, j1 = path[k + 1]
-            di = i1 - i0
-            dj = j1 - j0
-            ax.annotate(
-                "",
-                xy=(j1, i1),
-                xytext=(j0, i0),
-                arrowprops=dict(
-                    arrowstyle="-|>",
-                    color="red",
-                    lw=2.0,
-                    mutation_scale=14,
-                ),
-                zorder=7,
-            )
         path_i = [p[0] for p in path]
         path_j = [p[1] for p in path]
+        ax.plot(path_j, path_i, "-", color="red", linewidth=2, zorder=7)
         ax.scatter([path_j[0]], [path_i[0]], c="lime", s=200, marker="s",
                    label="start", zorder=8)
         ax.scatter([path_j[-1]], [path_i[-1]], c="gold", s=200, marker="*",
                    label="goal", zorder=8)
-        title = f"Optimal path (total damage = {total_damage})"
+        title = f"Optimal HP path (total damage = {total_damage})"
     else:
         title = "No path found"
 
-    ax.set_xticks(np.arange(cols))
-    ax.set_yticks(np.arange(rows))
-    ax.set_xticklabels(np.arange(cols))
-    ax.set_yticklabels(np.arange(rows))
+    _set_ticks(ax, rows, cols)
     ax.set_xlabel("j")
     ax.set_ylabel("i")
     ax.set_title(title)
@@ -422,5 +485,5 @@ def _save_path(height_map: np.ndarray, path, total_damage, out_dir: str) -> None
         frameon=True,
     )
     plt.tight_layout()
-    plt.savefig(os.path.join(out_dir, "optimal_path.png"), dpi=150, bbox_inches="tight")
+    plt.savefig(os.path.join(out_dir, "optimal_hp_path.png"), dpi=150, bbox_inches="tight")
     plt.close(fig)

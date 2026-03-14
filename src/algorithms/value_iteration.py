@@ -15,10 +15,10 @@ class ValueIteration(BaseAlgorithm):
             config: parsed value_iteration.yaml (gamma, theta)
         """
         super().__init__(env, config)
-        self._V: dict = {}       # {state: float}
         self._gamma: float = config["gamma"]
         self._theta: float = config["theta"]
         self._max_iters: int = config["max_iters"]
+        self._stop_criterion: str = config.get("stop_criterion", "delta")
 
     def solve(self) -> dict:
         """Run Value Iteration until convergence.
@@ -36,21 +36,26 @@ class ValueIteration(BaseAlgorithm):
 
         delta_history = []
         t_0 = time.perf_counter()
+        policy_prev = None
 
         for i in tqdm(range(self._max_iters)):
             V = self.V
-            V_next = V[self.next_state_ids]  # (n_states, n_actions)
-            self.V = np.max(self.R + self._gamma * V_next, axis=1)
+            Q = self.R + self._gamma * V[self.next_state_ids]  # (n_states, n_actions)
+            self.V = np.max(Q, axis=1)
             delta = np.max(np.abs(V - self.V))
             delta_history.append(delta)
-            iter = i
 
-            if delta < self._theta:
-                break
+            if self._stop_criterion == "delta":
+                if delta < self._theta:
+                    break
+            elif self._stop_criterion == "policy":
+                policy_curr = np.argmax(Q, axis=1)
+                if policy_prev is not None and np.array_equal(policy_curr, policy_prev):
+                    break
+                policy_prev = policy_curr
 
-        elapsed = time.perf_counter()-t_0
-
-        return {'iterations': iter, 'delta_history': delta_history, 'time': elapsed}            
+        elapsed = time.perf_counter() - t_0
+        return {"iterations": i, "delta_history": delta_history, "time": elapsed}
 
 
     def get_policy(self) -> dict:

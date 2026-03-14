@@ -2,6 +2,7 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+import numpy as np
 import yaml
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -44,6 +45,10 @@ def main(algorithm_name: str):
     # 2. Create environment
     env = ParkourEnv(env_config)
 
+    # Load min_hp map for this landscape
+    landscape_dir = PROJECT_ROOT / "landscape" / f"landscape_{env_config['landscape_id']}"
+    min_hp_map = np.load(landscape_dir / "min_hp.npy")
+
     # 3. Create and run algorithm
     algo = algo_cls(env, algo_config)
     info = algo.solve()
@@ -76,7 +81,7 @@ def main(algorithm_name: str):
 
     plot_height_map(env.height_map, save_path=out_dir / "height_map.png")
     plot_value_function(
-        V, env.height_map, env.hp_start, algo._state_to_id,
+        V, env.height_map, min_hp_map, algo._state_to_id,
         save_path=out_dir / "value_function.png",
     )
     plot_policy(

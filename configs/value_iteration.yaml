@@ -1,3 +1,4 @@
 gamma: 0.99
 theta: 1.0e-6
 max_iters: 1000
+stop_criterion: delta  # "delta" or "policy"
