@@ -23,7 +23,7 @@ def rollout_policy(
     Returns:
         dict with keys: trajectory, total_reward, steps, final_hp, victory
     """
-    state = (0, 0, env.hp_start)
+    state = (0, 0, getattr(env, "hp_init", env.hp_start))
     trajectory = []
     total_reward = 0.0
     steps = 0
