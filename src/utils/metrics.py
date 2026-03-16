@@ -10,6 +10,8 @@ def rollout_policy(
     actions: list,
     state_to_id: dict,
     max_steps: int = 10000,
+    start_state: tuple | None = None,
+    gamma: float = 1.0,
 ) -> dict:
     """Execute a policy from start state to termination.
 
@@ -19,13 +21,19 @@ def rollout_policy(
         states: list of state tuples, same order as policy indices
         actions: list of actions, same order as action indices
         state_to_id: mapping state tuple -> state index
+        start_state: optional starting (i, j, hp); defaults to (0, 0, hp_init)
+        gamma: discount factor (1.0 = undiscounted)
 
     Returns:
         dict with keys: trajectory, total_reward, steps, final_hp, victory
     """
-    state = (0, 0, getattr(env, "hp_init", env.hp_start))
+    if start_state is not None:
+        state = start_state
+    else:
+        state = (0, 0, getattr(env, "hp_init", env.hp_start))
     trajectory = []
     total_reward = 0.0
+    discount = 1.0
     steps = 0
     done = False
     dead = False
@@ -38,7 +46,8 @@ def rollout_policy(
         action = actions[a_id]
         next_state, reward, done, dead = env.step(state, action)
         trajectory.append((next_state, action, reward))
-        total_reward += reward
+        total_reward += discount * reward
+        discount *= gamma
         steps += 1
         state = next_state
 
@@ -51,6 +60,60 @@ def rollout_policy(
         "final_hp": final_hp,
         "victory": victory,
     }
+
+
+def sample_eval_cells(min_hp_map: np.ndarray, n: int = 10, rng: np.random.Generator | None = None) -> list:
+    """Sample n valid start cells from min_hp_map once (for reuse across iterations).
+
+    Only cells where 0 < min_hp_map[i, j] <= hp_start are included,
+    i.e. cells from which the agent with the maximum available HP can reach the goal.
+
+    Args:
+        min_hp_map: (rows, cols) array; cells with value > 0 are reachable
+        n: number of cells to sample
+        rng: optional random generator
+
+    Returns:
+        list of (i, j) tuples
+    """
+    if rng is None:
+        rng = np.random.default_rng()
+    reachable = min_hp_map[min_hp_map > 0]
+    hp_start = int(reachable.max()) if len(reachable) > 0 else 1
+    rows, cols = min_hp_map.shape
+    valid = [(i, j) for i in range(rows) for j in range(cols) if 0 < min_hp_map[i, j] <= hp_start]
+    indices = rng.choice(len(valid), size=min(n, len(valid)), replace=False)
+    return [valid[k] for k in indices]
+
+
+def eval_fixed_rollouts(
+    env: ParkourEnv,
+    policy: np.ndarray,
+    states: list,
+    actions: list,
+    state_to_id: dict,
+    min_hp_map: np.ndarray,
+    cells: list,
+    gamma: float = 1.0,
+    max_steps: int = 10000,
+) -> np.ndarray:
+    """Run rollouts from a fixed set of cells and return discounted return per cell.
+
+    Args:
+        cells: list of (i, j) tuples pre-sampled by sample_eval_cells
+        min_hp_map: used to look up starting HP for each cell
+        gamma: discount factor
+
+    Returns:
+        (n_cells,) array of discounted returns, one per cell
+    """
+    returns = []
+    for (i, j) in cells:
+        hp = int(min_hp_map[i, j])
+        result = rollout_policy(env, policy, states, actions, state_to_id,
+                                max_steps=max_steps, start_state=(i, j, hp), gamma=gamma)
+        returns.append(result["total_reward"])
+    return np.array(returns, dtype=float)
 
 
 def convergence_stats(info: dict) -> dict:

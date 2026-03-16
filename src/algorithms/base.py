@@ -1,12 +1,13 @@
 from abc import ABC, abstractmethod
 import numpy as np
 from src.environment.parkour_env import ParkourEnv
+from src.utils.metrics import sample_eval_cells, eval_fixed_rollouts
 
 
 class BaseAlgorithm(ABC):
     """Base class for all DP-RL algorithms."""
 
-    def __init__(self, env: ParkourEnv, config: dict):
+    def __init__(self, env: ParkourEnv, config: dict, min_hp_map: np.ndarray | None = None, eval_cells: list | None = None):
         """
         Args:
             env: initialized ParkourEnv instance
@@ -14,6 +15,14 @@ class BaseAlgorithm(ABC):
         """
         self.env = env
         self.config = config
+        self.min_hp_map = min_hp_map
+        if eval_cells is not None:
+            self._eval_cells = list(eval_cells)
+        elif min_hp_map is not None:
+            n_eval = config.get("n_eval_cells", 10)
+            self._eval_cells = sample_eval_cells(min_hp_map, n=n_eval)
+        else:
+            self._eval_cells = []
 
         # Fixed ordering of states and actions (for numpy tables)
         self.states = self.env.get_all_states()
@@ -48,6 +57,20 @@ class BaseAlgorithm(ABC):
 
         
 
+
+    def _eval_random_rollouts(self, policy: np.ndarray) -> np.ndarray | None:
+        """Evaluate policy on the fixed pre-sampled cells (same across all iterations).
+
+        Returns (n_cells,) array of discounted returns, or None if min_hp_map not provided.
+        """
+        if self.min_hp_map is None or not self._eval_cells:
+            return None
+        gamma = self.config.get("gamma", 1.0)
+        return eval_fixed_rollouts(
+            self.env, policy, self.states, self.actions,
+            self._state_to_id, self.min_hp_map, self._eval_cells,
+            gamma=gamma,
+        )
 
     def state2id(self, state: tuple) -> int:
         """Map state (row, col, hp) to a flat integer index.

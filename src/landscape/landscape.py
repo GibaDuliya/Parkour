@@ -298,17 +298,8 @@ def run_landscape(config: dict) -> None:
     max_jump_up: int = config["max_jump_up"]
     safe_jump_down: int = config["safe_jump_down"]
 
-    # Output directory: landscape_{next_number}
     base_dir = "landscape"
     os.makedirs(base_dir, exist_ok=True)
-    existing = [
-        int(name.split("_")[1])
-        for name in os.listdir(base_dir)
-        if name.startswith("landscape_") and name.split("_")[1].isdigit()
-    ]
-    next_num = max(existing, default=0) + 1
-    out_dir = os.path.join(base_dir, f"landscape_{next_num}")
-    os.makedirs(out_dir)
 
     # Step 1: generate map
     height_map = generate_height_map(grid_size, min_building_height, max_building_height, seed)
@@ -328,6 +319,40 @@ def run_landscape(config: dict) -> None:
     unit_graph = build_unit_graph(height_map, max_jump_up)
     total_steps, path_time = dijkstra_min_steps(unit_graph, height_map, safe_jump_down, start, end, hp_budget)
 
+    # Step 3: check reachability — skip landscape if ≥50% of cells can't reach the goal
+    total_cells = grid_size * grid_size
+    reachable_count = int((min_hp_map > 0).sum())
+    reachable_ratio = reachable_count / total_cells
+    if reachable_ratio < 0.5:
+        print(f"Skipped: only {reachable_ratio:.1%} of cells can reach the goal (seed={seed})")
+        return False
+
+    # Create output directory only after passing the reachability check
+    existing = [
+        int(name.split("_")[1])
+        for name in os.listdir(base_dir)
+        if name.startswith("landscape_") and name.split("_")[1].isdigit()
+    ]
+    next_num = max(existing, default=0) + 1
+    out_dir = os.path.join(base_dir, f"landscape_{next_num}")
+    os.makedirs(out_dir)
+
+    # Step 4: sample fixed eval cells (valid start positions)
+    # A cell is valid if the agent with hp_start HP can reach the goal from it,
+    # i.e. min_hp_map[i, j] <= hp_start where hp_start = max(min_hp_map[min_hp_map > 0])
+    n_eval_cells: int = config.get("n_eval_cells", 10)
+    rng = np.random.default_rng(seed)
+    reachable = min_hp_map[min_hp_map > 0]
+    hp_start = int(reachable.max()) if len(reachable) > 0 else 1
+    valid_cells = [
+        (i, j)
+        for i in range(grid_size)
+        for j in range(grid_size)
+        if 0 < min_hp_map[i, j] <= hp_start
+    ]
+    chosen_idx = rng.choice(len(valid_cells), size=min(n_eval_cells, len(valid_cells)), replace=False)
+    eval_cells = np.array([valid_cells[k] for k in chosen_idx], dtype=np.int32)  # [n, 2]
+
     # Save config
     with open(os.path.join(out_dir, "config.yaml"), "w") as f:
         yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
@@ -335,9 +360,10 @@ def run_landscape(config: dict) -> None:
     # Save arrays
     np.save(os.path.join(out_dir, "height_map.npy"), height_map)
     np.save(os.path.join(out_dir, "min_hp.npy"), min_hp_map)
+    np.save(os.path.join(out_dir, "eval_cells.npy"), eval_cells)
 
     # Save images
-    _save_height_map(height_map, out_dir)
+    _save_height_map(height_map, out_dir, eval_cells=eval_cells)
     _save_path(height_map, path_damage, total_damage, out_dir)  # -> optimal_hp_path.png
     _save_min_time_path(height_map, path_time, total_steps, hp_budget, out_dir)
     _save_min_hp_map(min_hp_map, out_dir)
@@ -351,6 +377,7 @@ def run_landscape(config: dict) -> None:
     else:
         print(f"Min-time path:   steps={total_steps}, min HP={hp_budget}")
     print(f"Saved to: {out_dir}/")
+    return True
 
 
 # ---------------------------------------------------------------------------
@@ -370,7 +397,7 @@ def _set_ticks(ax, rows: int, cols: int) -> None:
     ax.set_yticklabels(np.arange(0, rows, y_step))
 
 
-def _save_height_map(height_map: np.ndarray, out_dir: str) -> None:
+def _save_height_map(height_map: np.ndarray, out_dir: str, eval_cells: np.ndarray | None = None) -> None:
     rows, cols = height_map.shape
     fig, ax = plt.subplots(figsize=(6, 6))
     im = ax.imshow(height_map, cmap="YlGnBu", aspect="equal", origin="upper", alpha=0.8)
@@ -382,10 +409,14 @@ def _save_height_map(height_map: np.ndarray, out_dir: str) -> None:
                 ax.text(j, i, int(height_map[i, j]), ha="center", va="center",
                         color="black", fontsize=10)
 
+    if eval_cells is not None and len(eval_cells) > 0:
+        ax.scatter(eval_cells[:, 1], eval_cells[:, 0], c="red", s=60, zorder=5, label="eval cells")
+        ax.legend(loc="upper left", fontsize=8)
+
     _set_ticks(ax, rows, cols)
     ax.set_xlabel("j")
     ax.set_ylabel("i")
-    ax.set_title("Height map")
+    ax.set_title("Height map of the training grid")
     plt.tight_layout()
     plt.savefig(os.path.join(out_dir, "height_map.png"), dpi=150)
     plt.close(fig)

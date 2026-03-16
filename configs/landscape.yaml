@@ -4,3 +4,4 @@ min_building_height: 1
 max_building_height: 10
 max_jump_up: 3
 safe_jump_down: 1
+n_eval_cells: 10

@@ -8,13 +8,8 @@ import time
 class ValueIteration(BaseAlgorithm):
     """Value Iteration algorithm."""
 
-    def __init__(self, env: ParkourEnv, config: dict):
-        """
-        Args:
-            env: ParkourEnv instance
-            config: parsed value_iteration.yaml (gamma, theta)
-        """
-        super().__init__(env, config)
+    def __init__(self, env: ParkourEnv, config: dict, min_hp_map=None, eval_cells=None):
+        super().__init__(env, config, min_hp_map=min_hp_map, eval_cells=eval_cells)
         self._gamma: float = config["gamma"]
         self._theta: float = config["theta"]
         self._max_iters: int = config["max_iters"]
@@ -35,8 +30,10 @@ class ValueIteration(BaseAlgorithm):
         n_actions = len(self.actions)
 
         delta_history = []
+        return_history = []
         t_0 = time.perf_counter()
         policy_prev = None
+        eval_every = self.config.get("eval_every", 1)
 
         for i in tqdm(range(self._max_iters)):
             V = self.V
@@ -45,17 +42,28 @@ class ValueIteration(BaseAlgorithm):
             delta = np.max(np.abs(V - self.V))
             delta_history.append(delta)
 
+            policy_curr = np.argmax(Q, axis=1)
+
+            if (i + 1) % eval_every == 0:
+                returns = self._eval_random_rollouts(policy_curr)
+                if returns is not None:
+                    return_history.append((i, returns))
+
             if self._stop_criterion == "delta":
                 if delta < self._theta:
                     break
             elif self._stop_criterion == "policy":
-                policy_curr = np.argmax(Q, axis=1)
                 if policy_prev is not None and np.array_equal(policy_curr, policy_prev):
                     break
                 policy_prev = policy_curr
 
         elapsed = time.perf_counter() - t_0
-        return {"iterations": i, "delta_history": delta_history, "time": elapsed}
+        return {
+            "iterations": i,
+            "delta_history": delta_history,
+            "return_history": return_history,
+            "time": elapsed,
+        }
 
 
     def get_policy(self) -> dict:

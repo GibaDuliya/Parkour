@@ -20,7 +20,11 @@ def _set_ticks(ax, rows: int, cols: int) -> None:
     ax.set_yticklabels(np.arange(0, rows, y_step))
 
 
-def plot_height_map(height_map: np.ndarray, save_path: str | Path | None = None) -> None:
+def plot_height_map(
+    height_map: np.ndarray,
+    eval_cells: list | None = None,
+    save_path: str | Path | None = None,
+) -> None:
     rows, cols = height_map.shape
     fig, ax = plt.subplots()
     im = ax.imshow(height_map, cmap="YlGnBu", aspect="equal", origin="upper")
@@ -32,7 +36,14 @@ def plot_height_map(height_map: np.ndarray, save_path: str | Path | None = None)
                 ax.text(j, i, int(height_map[i, j]), ha="center", va="center",
                         color="black", fontsize=10)
 
+    if eval_cells:
+        xs = [j for (i, j) in eval_cells]
+        ys = [i for (i, j) in eval_cells]
+        ax.scatter(xs, ys, c="red", s=60, zorder=5, label="eval cells")
+        ax.legend(loc="upper left", fontsize=8)
+
     _set_ticks(ax, rows, cols)
+    ax.set_title("Height map of the training grid")
     ax.set_xlabel("j")
     ax.set_ylabel("i")
     plt.tight_layout()
@@ -173,15 +184,34 @@ def plot_trajectory(trajectory: list, height_map: np.ndarray, save_path: str | P
 
 def plot_convergence(info: dict, save_path: str | Path | None = None) -> None:
     delta_history = info.get("delta_history", [])
+    return_history = info.get("return_history", [])  # list of (iter_idx, mean_return)
+
     if not delta_history:
         return
 
-    fig, ax = plt.subplots()
+    has_returns = bool(return_history)
+    n_plots = 2 if has_returns else 1
+    fig, axes = plt.subplots(1, n_plots, figsize=(6 * n_plots, 4))
+    if n_plots == 1:
+        axes = [axes]
+
+    ax = axes[0]
     ax.plot(np.arange(1, len(delta_history) + 1), delta_history, "b-o", markersize=4)
     ax.set_xlabel("Iteration")
     ax.set_ylabel("Max |V_new - V_old|")
     ax.set_title("Convergence")
     ax.grid(True, alpha=0.3)
+
+    if has_returns:
+        iters, returns_list = zip(*return_history)
+        mean_returns = [r.mean() for r in returns_list]
+        ax2 = axes[1]
+        ax2.plot(np.array(iters) + 1, mean_returns, "g-o", markersize=4)
+        ax2.set_xlabel("Iteration")
+        ax2.set_ylabel("Mean discounted return")
+        ax2.set_title("Training returns")
+        ax2.grid(True, alpha=0.3)
+
     plt.tight_layout()
     if save_path:
         fig.savefig(save_path, dpi=150, bbox_inches="tight")

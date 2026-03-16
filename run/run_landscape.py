@@ -18,5 +18,13 @@ def load_config():
 
 
 if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Generate a landscape")
+    parser.add_argument("--seed", type=int, default=None, help="Override seed from config")
+    args = parser.parse_args()
+
     config = load_config()
+    if args.seed is not None:
+        config["seed"] = args.seed
     run_landscape(config)

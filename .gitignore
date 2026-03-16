@@ -32,5 +32,7 @@ outputs/
 results/
 plots/
 landscape/
+agents/
 *.png
 *.json
+*.npy

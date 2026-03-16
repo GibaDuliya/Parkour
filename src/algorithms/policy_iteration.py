@@ -10,8 +10,8 @@ from src.environment.parkour_env import ParkourEnv
 class PolicyIteration(BaseAlgorithm):
     """Policy Iteration: alternate policy evaluation and policy improvement."""
 
-    def __init__(self, env: ParkourEnv, config: dict):
-        super().__init__(env, config)
+    def __init__(self, env: ParkourEnv, config: dict, min_hp_map=None, eval_cells=None):
+        super().__init__(env, config, min_hp_map=min_hp_map, eval_cells=eval_cells)
         self._gamma = config["gamma"]
         self._theta = config["theta"]
         self._max_eval_iters = config.get("max_eval_iters", 1000)
@@ -20,20 +20,31 @@ class PolicyIteration(BaseAlgorithm):
 
     def solve(self) -> dict:
         delta_history = []
+        return_history = []
         t0 = time.perf_counter()
+        eval_every = self.config.get("eval_every", 1)
+        outer_iter = 0
         with tqdm() as pbar:
             while True:
                 self._policy_evaluation()
                 policy_new, delta = self._policy_improvement()
                 delta_history.append(delta)
+
+                if (outer_iter + 1) % eval_every == 0:
+                    returns = self._eval_random_rollouts(policy_new)
+                    if returns is not None:
+                        return_history.append((outer_iter, returns))
+
                 pbar.update(1)
                 pbar.set_postfix(delta=f"{delta:.2e}")
                 if np.array_equal(policy_new, self._policy):
                     break
                 self._policy = policy_new
+                outer_iter += 1
         return {
             "iterations": len(delta_history),
             "delta_history": delta_history,
+            "return_history": return_history,
             "time": time.perf_counter() - t0,
         }
 
