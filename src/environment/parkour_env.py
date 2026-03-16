@@ -42,12 +42,15 @@ class ParkourEnv:
             self.height_map = np.load(os.path.join(landscape_dir, "height_map.npy"))
             self.rows, self.cols = self.height_map.shape
             min_hp_map = np.load(os.path.join(landscape_dir, "min_hp.npy"))
-            if "hp_start" in env_config:
-                self.hp_start = int(env_config["hp_start"])
-                self.hp_init = int(env_config.get("hp_init", self.hp_start))
-            else:
-                self.hp_start = int(min_hp_map[min_hp_map > 0].max())  # state space bound
-                self.hp_init = int(min_hp_map[0, 0])                   # rollout starting HP
+            bonus_pct = env_config.get("hp_bonus_pct", 0.0)
+            abs_max_min_hp = int(min_hp_map[min_hp_map > 0].max())
+            
+            # Это будет "потолок" для таблицы переходов T
+            self.hp_start = int(abs_max_min_hp * (1 + bonus_pct))
+            
+            # Для простоты обучения, hp_init (старт из 0,0) тоже считаем с бонусом
+            self.hp_init = int(min_hp_map[0, 0] * (1 + bonus_pct))    
+            
             self.rewards = env_config["rewards"]
             self.max_jump_up = int(landscape_cfg["max_jump_up"])
             self.safe_jump_down = int(landscape_cfg["safe_jump_down"])
