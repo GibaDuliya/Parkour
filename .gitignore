@@ -34,5 +34,7 @@ plots/
 landscape/
 agents/
 *.png
+!readme_nec/*.png
+!readme_nec/**/*.png
 *.json
 *.npy
