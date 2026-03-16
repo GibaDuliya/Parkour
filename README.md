@@ -365,3 +365,5 @@ This project implements and compares two classical dynamic programming algorithm
 
 ## 5. Reproduction Instructions
 
+Check LAUNCH.md for details
+
