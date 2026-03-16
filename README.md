@@ -274,8 +274,73 @@ The procedure is as follows:
 - The optimal path length **non-strictly decreases** as $\text{hp}_{\text{start}}$ increases — more health allows the agent to choose shorter, higher-damage routes.
 - Beyond a certain HP threshold, the path length saturates at the **Manhattan distance** $2(N - 1)$ between the start $(0, 0)$ and the goal $(N{-}1,\, N{-}1)$, meaning the agent has enough HP to take the geometrically shortest route regardless of fall damage.
 
+---
 
-## 4. Summary
+## 4. Agents evaluation
+
+We evaluated our agents on 10 maps, 10 random starting cells for each map. 10 starting points are fixed for each map and shared across agents. All in all every agent is evaluated on 100 episodes. For each starting point all agents are given the minimum number of hp to win the game (to come to the final cell alive).
+
+We compared the following **agents**:
+- Value iteration agent
+- Policy iteration agent
+- Safest Path agent
+
+Safest Path agent uses Dijkstra's algorithm to find the minimum-damage path to reach the target cell. 
+
+- Shortest Path agent
+
+Safest Path agent uses Dijkstra's algorithm to find the minimum-step path to reach the target cell without any consideration of his hp.
+
+- Budget Greedy agent
+
+A local heuristic that combines greediness toward the goal with adaptive caution. At each step, it computes a per-step HP budget based on remaining HP and Manhattan distance to the goal:
+  $$ budget_{per step}  =  (hp − 1)  /  manhattan( (i,j), (7,7) ) $$
+It then selects the action that minimises Manhattan distance to (7, 7), subject to the constraint that the fall damage does not exceed the budget. If no action satisfies the budget, the agent picks the action with the lowest damage. This agent has no global knowledge of the map — it only uses current HP and position.
+
+- Random agent
+ 
+ At each step, selects a uniformly random action from the four directions. Invalid moves (out of bounds or jump too high) result in a self-loop. Serves as the lower bound on performance.
+
+We used the following **metrics** for evaluation: 
+- Success rate: Fraction of episodes where the agent reaches (7,7) alive. Bigger is better.
+- Avg steps: Mean number of steps over all 100 episodes. Failed episodes (death or timeout) are not considered. Lower is better.
+- Avg reward: Mean discounted return over all 100 episodes (including failures)
+
+```
+ FINAL AGGREGATED RESULTS (Averaged across all maps and starting cells)
+================================================================================
+Agent Name                   | Success Rate   | Avg Steps  | Avg Reward
+--------------------------------------------------------------------------------
+value_iteration              |    100.0%      |      125.7 |      -34.2
+policy_iteration             |    100.0%      |      125.7 |      -34.2
+Safest Path                  |    100.0%      |      130.8 |      -36.5
+Shortest Path                |      2.0%      |        9.0 |      -96.3
+Budget Greedy                |      1.0%      |        3.0 |      -98.0
+Random                       |      0.0%      |        nan |     -100.0
+================================================================================
+```
+
+As we can see from this table, VI and PI agents always win the game, as well as Safest path agent. Safest path agent makes more steps to reach the goal in comparison with VI/PI agents. Even though Budget Greedy and Shortest Path agents make less steps per episode to reach the goal, their success rate is close to zero (they are sometimes very lucky to win the game where a starting point is close to the finish). The main comparison criteria here is avg reward. It is maximum for VI/PI agents which highlights the superior performance.
+
+Also, we decided to check whether our results will remain stable when agents start their episode with not-minimum hp, but with some surplus. So, we increased hp for each starting point by 30%. 
+
+```
+================================================================================
+Agent Name                   | Total SR   | Avg Steps  | Avg Reward
+--------------------------------------------------------------------------------
+value_iteration              |    100.0% |      100.9 |      -19.9
+policy_iteration             |    100.0% |      100.9 |      -19.9
+Safest Path                  |    100.0% |      130.8 |      -36.5
+Shortest Path                |     26.0% |       76.0 |      -72.5
+Budget Greedy                |      1.0% |        3.0 |      -98.0
+Random                       |      1.0% |       25.0 |      -98.4
+================================================================================
+```
+
+As we can see from the table above, superiority of VI/PI agents remains the same even in hp surplus scenario, when Shortest Path agent significantly increased his success rate and Avg reward per episode.    
+
+
+## 5. Summary
 
 This project implements and compares two classical dynamic programming algorithms — **Value Iteration** and **Policy Iteration** — on the Parkour grid-world environment, where an agent must navigate an $N \times N$ grid of buildings with varying heights while managing limited health points.
 
