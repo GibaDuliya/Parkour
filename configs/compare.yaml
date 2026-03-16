@@ -1,0 +1,12 @@
+# Evaluation settings
+N_MAPS_EVAL: 5        # Для теста 100x100 лучше начать с 10 карт (иначе будешь ждать часами)
+N_EVAL_PER_MAP: 5      # 5 стартовых точек на каждую карту
+RANDOM_INIT_EVAL: true
+MAX_STEPS: 2000        # УВЕЛИЧЕНО! Иначе агенты не успеют дойти физически
+
+# Map generation settings (должны совпадать с landscape.yaml)
+grid_size: 100
+min_building_height: 1
+max_building_height: 10
+max_jump_up: 3
+safe_jump_down: 1
