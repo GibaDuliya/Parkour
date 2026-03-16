@@ -278,7 +278,7 @@ The procedure is as follows:
 This project implements and compares two classical dynamic programming algorithms — **Value Iteration** and **Policy Iteration** — on the Parkour grid-world environment, where an agent must navigate an $N \times N$ grid of buildings with varying heights while managing limited health points.
 
 **Environment design:**
-- Dijkstra's algorithm is used both to validate landscape solvability and to calibrate the starting HP ($\text{hp}_{\text{start}} = \text{cost}_{\min} + 1$), ensuring a tight but feasible constraint.
+- Dijkstra's algorithm is used both to validate landscape solvability and to calibrate the starting HP ($\text{hp}\_{\text{start}} = \text{cost}\_{\min} + 1$), ensuring a tight but feasible constraint.
 - The minimum HP map visualization confirms that cells closer to the goal require less health, as expected.
 
 **Algorithm convergence:**
