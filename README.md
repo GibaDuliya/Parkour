@@ -366,3 +366,7 @@ This project implements and compares two classical dynamic programming algorithm
 
 Check LAUNCH.md for details
 
+## 6. Chat with chat bot
+
+https://claude.ai/share/0750d04d-356a-4aa1-a575-c2b64efc7d4d
+
