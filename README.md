@@ -54,7 +54,7 @@ Jumping up or sideways costs 0 HP; jumping down by 1 costs 0 HP; jumping down by
 
 The full transition function:
 
-$$T(s, a) = \begin{cases} s & \text{if } \text{hp} \leq 0 \quad \text{(dead)} \ \text{or if } (i, j) = (N - 1, N - 1)  \\ s & \text{if } (i',j') \text{ out of bounds} \\ s & \text{if } \Delta h > 3 \quad \text{(jump too high)} \\ (i',\; j',\; \text{hp} - \text{damage}) & \text{otherwise} \end{cases}$$
+$$T(s, a) = \begin{cases} s & \text{if } \text{hp} \leq 0 \quad \text{(dead)} \ \text{or if } (i, j) = (N - 1, N - 1)  \\\\ s & \text{if } (i',j') \text{ out of bounds} \\\\ s & \text{if } \Delta h > 3 \quad \text{(jump too high)} \\\\ (i',\; j',\; \text{hp} - \text{damage}) & \text{otherwise} \end{cases}$$
 
 **Terminal states** (absorbing, no further transitions):
 - **Victory:** agent reaches $(N{-}1,\, N{-}1)$ with $\text{hp} > 0$
@@ -62,8 +62,8 @@ $$T(s, a) = \begin{cases} s & \text{if } \text{hp} \leq 0 \quad \text{(dead)} \ 
 
 ### Reward Function
 
-$$r(s, a) = \begin{cases} -100 & \text{if } \text{hp}' \leq 0 \ \text{and hp} > 0 \quad \text{(death - agent die bacause of the move)} \\ +100 & \text{if }(i, j) \neq (N{-}1,\, N{-}1),\ (i', j') = (N{-}1,\, N{-}1) \text{ and } \text{hp}' > 0 \quad \text{(victory)} \\
- 0 &  \text{if hp } \leq 0 \ \text{or if } (i, j) = (N - 1, N - 1) \\
+$$r(s, a) = \begin{cases} -100 & \text{if } \text{hp}' \leq 0 \ \text{and hp} > 0 \quad \text{(death - agent die bacause of the move)} \\\\ +100 & \text{if }(i, j) \neq (N{-}1,\, N{-}1),\ (i', j') = (N{-}1,\, N{-}1) \text{ and } \text{hp}' > 0 \quad \text{(victory)} \\\\
+ 0 &  \text{if hp } \leq 0 \ \text{or if } (i, j) = (N - 1, N - 1) \\\\
  -1 & \text{otherwise} \quad \text{(step penalty)} \end{cases}$$
 
 > **Note:** Death is checked before victory. If the agent jumps onto the goal cell but $\text{hp}' \leq 0$, the outcome is death.
@@ -135,7 +135,7 @@ $$\boxed{
 \end{aligned}
 }$$
 
-**Convergence.** Value Iteration is guaranteed to converge because the Bellman optimality operator is a $\gamma$-contraction in the $\|\cdot\|_\infty$ norm. At each iteration the error decreases by at least a factor of $\gamma$:
+**Convergence.** Value Iteration is guaranteed to converge because the Bellman optimality operator is a $\gamma$-contraction in the $\|\cdot\|\_\infty$ norm. At each iteration the error decreases by at least a factor of $\gamma$:
 
 $$\|V_{k+1} - V^{\ast}\|_\infty \;\leq\; \gamma\,\|V_k - V^{\ast}\|_\infty$$
 
@@ -147,7 +147,7 @@ Hence convergence is geometric with rate $\gamma$. In practice, with $\gamma = 0
 </p>
 
 **Plot description:**
-The plot shows $\|V_{k+1} - V_k\|_\infty$ decreasing monotonically towards zero with each iteration, confirming convergence. Since the Bellman optimality operator is a $\gamma$-contraction, this guarantees that $V_k \to V^{\ast}$. Note, however, that a small $\|V_{k+1} - V_k\|_\infty$ does not tell us the exact iteration at which the derived policy $\pi_k$ becomes optimal — the value function may still be refining while the policy has already stabilized.
+The plot shows $\|V\_{k+1} - V_k\|\_\infty$ decreasing monotonically towards zero with each iteration, confirming convergence. Since the Bellman optimality operator is a $\gamma$-contraction, this guarantees that $V_k \to V^{\ast}$. Note, however, that a small $\|V\_{k+1} - V_k\|\_\infty$ does not tell us the exact iteration at which the derived policy $\pi\_k$ becomes optimal — the value function may still be refining while the policy has already stabilized.
 
 
 ### 2.3 Policy Iteration
@@ -184,7 +184,7 @@ $$\boxed{
 </p>
 
 **Plot description:**
-Similarly to VI, $\|V_{k+1} - V_k\|_\infty$ decreases over iterations. However, a distinctive feature of PI is visible at the end of the curve: a sharp drop to zero. This happens because PI converges in a **finite** number of outer steps — once the greedy policy no longer changes ($\pi_{\text{new}} = \pi$), the algorithm terminates. Unlike VI, which asymptotically approaches the optimum, PI reaches the exact optimal policy and stops abruptly.
+Similarly to VI, $\|V\_{k+1} - V_k\|\_\infty$ decreases over iterations. However, a distinctive feature of PI is visible at the end of the curve: a sharp drop to zero. This happens because PI converges in a **finite** number of outer steps — once the greedy policy no longer changes ($\pi\_{\text{new}} = \pi$), the algorithm terminates. Unlike VI, which asymptotically approaches the optimum, PI reaches the exact optimal policy and stops abruptly.
 
 ### Per-Episode Reward Over Training Iterations
 
@@ -294,7 +294,7 @@ Safest Path agent uses Dijkstra's algorithm to find the minimum-step path to rea
 - Budget Greedy agent
 
 A local heuristic that combines greediness toward the goal with adaptive caution. At each step, it computes a per-step HP budget based on remaining HP and Manhattan distance to the goal:
-  $$ budget_{per step}  =  (hp − 1)  /  manhattan( (i,j), (7,7) ) $$
+  $$\text{budget}\_{\text{per step}} = (\text{hp} - 1) \big/ \text{manhattan}\big((i,j), (7,7)\big)$$
 It then selects the action that minimises Manhattan distance to (7, 7), subject to the constraint that the fall damage does not exceed the budget. If no action satisfies the budget, the agent picks the action with the lowest damage. This agent has no global knowledge of the map — it only uses current HP and position.
 
 - Random agent
@@ -351,7 +351,7 @@ This project implements and compares two classical dynamic programming algorithm
 
 **Algorithm convergence:**
 - Both VI and PI converge to the same optimal policy, as guaranteed by theory.
-- VI converges asymptotically — $\|V_{k+1} - V_k\|_\infty$ decreases smoothly due to the $\gamma$-contraction property, though the policy may stabilize before the value function fully converges.
+- VI converges asymptotically — $\|V\_{k+1} - V_k\|\_\infty$ decreases smoothly due to the $\gamma$-contraction property, though the policy may stabilize before the value function fully converges.
 - PI converges in a finite number of outer steps with a characteristic sharp drop to zero once the policy stabilizes, but each step is more expensive due to the full policy evaluation phase.
 
 **Ablation studies:**
