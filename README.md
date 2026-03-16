@@ -10,7 +10,7 @@ The agent starts at some random start cell $(i_{\text{start}}, j_{\text{start}})
   <img src="./readme_nec/gameplay.gif" alt="Agent traversing the parkour grid" width="600"/>
 </p>
 <p align="center">
-  <em> The sample of the playing of the agent according to the learned optimal policy through Policy Iteration algorithm. </em>
+  <em> The sample of the playing of the agent according to the learned optimal policy through Value Iteration algorithm. </em>
 </p>
 
 ### State Space
