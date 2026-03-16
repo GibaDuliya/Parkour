@@ -64,12 +64,23 @@ def make_gif_for_agent(agent_dir: Path):
     is_victory = rollout['victory']
     print(f"[{meta['algorithm']}] Steps: {rollout['steps']}, Reward: {rollout['total_reward']}, Victory: {is_victory}")
 
+    # ==========================================
+    # РАСЧЕТ ДИНАМИЧЕСКОГО FPS
+    # Базовая длительность: 3 секунды.
+    # Масштабируется параметром gif_scale_factor из env.yaml.
+    # ==========================================
+    scale = env_config.get("gif_scale_factor", 1.0)
+    target_duration = 3.0 / scale
+    # Гарантируем, что fps не упадет ниже 2 кадров/сек, чтобы не было слайд-шоу
+    fps = max(2, int(len(path_states) / target_duration))
+
     # 4. Visualization Setup
     height_map = env.height_map
     rows, cols = height_map.shape
 
-    fig, ax = plt.subplots(figsize=(7, 7), dpi=100)
-    fig.patch.set_facecolor('#f8f9fa')  # Light background
+    # Увеличенный размер окна графика (8x8.5)
+    fig, ax = plt.subplots(figsize=(8, 8.5), dpi=100)  
+    fig.patch.set_facecolor('#f8f9fa')
     ax.set_facecolor('#f8f9fa')
     
     # Draw height map
@@ -77,31 +88,31 @@ def make_gif_for_agent(agent_dir: Path):
     cbar = plt.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
     cbar.set_label("Building Height", rotation=270, labelpad=15, fontweight='bold')
 
+    # Отрисовка цифр высот (только если поле не слишком огромное)
     if rows <= 20 and cols <= 20:
         for i in range(rows):
             for j in range(cols):
                 ax.text(j, i, int(height_map[i, j]), ha="center", va="center", 
-                        color="black", fontsize=9, alpha=0.6)
+                        color="black", fontsize=10, alpha=0.7)
 
     # Markers for Start and Goal
     ax.scatter(0, 0, c="lime", s=250, marker="s", edgecolors="black", linewidth=1.5, label="Start", zorder=3)
     ax.scatter(cols - 1, rows - 1, c="gold", s=350, marker="*", edgecolors="black", linewidth=1.5, label="Goal", zorder=3)
     
-    # Trail line and Agent marker
-    trail_line, = ax.plot([], [], color='white', linewidth=2, linestyle='--', alpha=0.7, zorder=4)
+    # Trail line (Красная) and Agent marker
+    trail_line, = ax.plot([], [], color='red', linewidth=2.5, linestyle='--', alpha=0.8, zorder=4)
     agent_dot, = ax.plot([], [], marker='o', color='crimson', markersize=14, markeredgecolor='white', markeredgewidth=2, zorder=5, label='Agent')
     
     # ==========================================
-    # ПЛАШКА С НАЗВАНИЕМ АЛГОРИТМА (WATERMARK)
+    # ЗАГОЛОВКИ (Над картой, не перекрывая ее)
     # ==========================================
     algo_name = meta['algorithm'].replace("_", " ").upper()
-    ax.text(0.5, 0.95, algo_name, 
-            transform=ax.transAxes, fontsize=14, fontweight='bold', color='white', 
-            ha='center', va='top', zorder=10,
-            bbox=dict(facecolor='black', alpha=0.6, edgecolor='none', boxstyle='round,pad=0.5'))
-
-    # Title/HUD
-    title_text = ax.set_title("", fontsize=12, family='monospace', pad=15)
+    
+    # Главный заголовок (Название алгоритма)
+    fig.suptitle(f"Algorithm: {algo_name}", fontsize=16, fontweight='black', color='#2c3e50', y=0.96)
+    
+    # Динамический HUD под главным заголовком
+    title_text = ax.set_title("", fontsize=13, family='monospace', pad=10)
     
     # Grid styling
     ax.set_xticks(np.arange(-0.5, cols, 1), minor=True)
@@ -111,11 +122,16 @@ def make_gif_for_agent(agent_dir: Path):
     
     ax.set_xticks(np.arange(0, cols, max(1, cols // 10)))
     ax.set_yticks(np.arange(0, rows, max(1, rows // 10)))
-    ax.set_xlabel("i", fontweight='bold')
-    ax.set_ylabel("j", fontweight='bold')
+    ax.set_xlabel("j", fontweight='bold')
+    ax.set_ylabel("i", fontweight='bold')
     
     ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.1), ncol=3, frameon=True, facecolor='white', edgecolor='black')
-    plt.tight_layout()
+    
+    # ИСПРАВЛЕНИЕ КРОПА:
+    # rect = [left, bottom, right, top]
+    # bottom=0.08 дает 8% отступа снизу, чтобы легенда влезла целиком
+    # top=0.93 оставляет 7% сверху для заголовков
+    plt.tight_layout(rect=[0, 0.08, 1, 0.93])
 
     # Animation init
     def init():
@@ -161,10 +177,10 @@ def make_gif_for_agent(agent_dir: Path):
             agent_dot.set_marker('o')
             agent_dot.set_markersize(14)
 
-        # Update HUD Text (Убрали название алгоритма из текста, так как оно теперь на плашке)
+        # Update HUD Text
         real_step = min(frame, len(rollout["trajectory"]))
         hud = (
-            f"Step: {real_step:03d} | HP: {hp:02d}/{hp_start:02d}\n"
+            f"Step: {real_step:03d} | HP: {hp:02d}/{hp_start:02d} | "
             f"Reward: {rew:+.1f} | Status: {status}"
         )
         
@@ -179,19 +195,11 @@ def make_gif_for_agent(agent_dir: Path):
         init_func=init, blit=False, repeat=False
     )
 
-    # ==========================================
-    # СОХРАНЯЕМ 2 ВЕРСИИ GIF (1x и 2x скорость)
-    # ==========================================
+    # Сохраняем итоговый GIF
     try:
-        # 1. Обычная скорость (4 кадра в секунду)
-        gif_normal = agent_dir / "gameplay.gif"
-        ani.save(gif_normal, writer=PillowWriter(fps=4))
-        print(f"Saved Normal Speed GIF -> {gif_normal}")
-
-        # 2. Ускоренная версия (8 кадров в секунду)
-        gif_fast = agent_dir / "gameplay_2x.gif"
-        ani.save(gif_fast, writer=PillowWriter(fps=8))
-        print(f"Saved 2x Speed GIF     -> {gif_fast}")
+        gif_path = agent_dir / "gameplay.gif"
+        ani.save(gif_path, writer=PillowWriter(fps=fps))
+        print(f"Saved GIF (Duration: ~{target_duration:.1f}s, FPS: {fps}) -> {gif_path}")
     except Exception as e:
         print(f"Failed to save GIF: {e}. (Make sure 'Pillow' is installed: pip install Pillow)")
     
