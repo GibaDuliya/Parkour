@@ -94,19 +94,19 @@ This serves two purposes: (1) validating that a generated landscape is solvable,
 
 $$\boxed{
 \begin{aligned}
-& \textbf{Algorithm: Dijkstra's Shortest Path} \\[4pt]
-& \textbf{Input: } \text{Graph } G = (V, E, w), \text{ start node } s, \text{ goal node } g \\
-& \textbf{Output: } \text{Minimum cost } d[g], \text{ shortest path } P \\[4pt]
-& 1.\quad \text{Initialize } d[v] \leftarrow \infty \;\forall\, v \in V;\quad d[s] \leftarrow 0 \\
-& 2.\quad \text{Priority queue } Q \leftarrow \{(0, s)\} \\
-& 3.\quad \textbf{while } Q \neq \emptyset: \\
-& 4.\quad \qquad (c, u) \leftarrow Q.\text{pop\\_min}() \\
-& 5.\quad \qquad \textbf{if } u = g: \text{ return } (d[g],\; P) \\
-& 6.\quad \qquad \textbf{for } (v, w_{uv}) \in \text{neighbors}(u): \\
-& 7.\quad \qquad \qquad \textbf{if } d[u] + w_{uv} < d[v]: \\
-& 8.\quad \qquad \qquad \qquad d[v] \leftarrow d[u] + w_{uv} \\
-& 9.\quad \qquad \qquad \qquad \text{parent}[v] \leftarrow u \\
-& 10.\quad \qquad \qquad \qquad Q.\text{push}((d[v], v)) \\
+& \textbf{Algorithm: Dijkstra's Shortest Path} \\\\[4pt]
+& \textbf{Input: } \text{Graph } G = (V, E, w), \text{ start node } s, \text{ goal node } g \\\\
+& \textbf{Output: } \text{Minimum cost } d[g], \text{ shortest path } P \\\\[4pt]
+& 1.\quad \text{Initialize } d[v] \leftarrow \infty \;\forall\, v \in V;\quad d[s] \leftarrow 0 \\\\
+& 2.\quad \text{Priority queue } Q \leftarrow \{(0, s)\} \\\\
+& 3.\quad \textbf{while } Q \neq \emptyset: \\\\
+& 4.\quad \qquad (c, u) \leftarrow Q.\text{pop\\_min}() \\\\
+& 5.\quad \qquad \textbf{if } u = g: \text{ return } (d[g],\; P) \\\\
+& 6.\quad \qquad \textbf{for } (v, w_{uv}) \in \text{neighbors}(u): \\\\
+& 7.\quad \qquad \qquad \textbf{if } d[u] + w_{uv} < d[v]: \\\\
+& 8.\quad \qquad \qquad \qquad d[v] \leftarrow d[u] + w_{uv} \\\\
+& 9.\quad \qquad \qquad \qquad \text{parent}[v] \leftarrow u \\\\
+& 10.\quad \qquad \qquad \qquad Q.\text{push}((d[v], v)) \\\\
 & 11.\quad \text{return } (\infty, \; \text{None})
 \end{aligned}
 }$$
@@ -119,18 +119,18 @@ $$V_{k+1}(s) = \max_{a \in \mathcal{A}} \Big[ r(s, a) + \gamma \, V_{k}\!\big(T(
 
 $$\boxed{
 \begin{aligned}
-& \textbf{Algorithm: Value Iteration} \\[4pt]
-& \textbf{Input: } \text{MDP } (\mathcal{S}, \mathcal{A}, T, r, \gamma), \text{ threshold } \theta \\
-& \textbf{Output: } \text{Optimal value function } V^{\ast}, \text{ optimal policy } \pi^{\ast} \\[4pt]
-& 1.\quad V(s) \leftarrow 0 \;\;\forall\, s \in \mathcal{S} \\
-& 2.\quad \textbf{repeat:} \\
-& 3.\quad \qquad \delta \leftarrow 0 \\
-& 4.\quad \qquad \textbf{for each } s \in \mathcal{S}: \\
-& 5.\quad \qquad \qquad v \leftarrow V(s) \\
-& 6. \quad \qquad \qquad \pi(s) \leftarrow \arg\max_{a} \big[ r(s,a) + \gamma \, V(T(s,a)) \big] \\
-& 7.\quad \qquad \qquad V(s) \leftarrow  r(s,\pi(s)) + \gamma \, V(T(s,\pi(s))) \\
-& 8.\quad \qquad \qquad \delta \leftarrow \max(\delta, \; |v - V(s)|) \\
-& 9.\quad \textbf{until } \delta < \theta \\[4pt]
+& \textbf{Algorithm: Value Iteration} \\\\[4pt]
+& \textbf{Input: } \text{MDP } (\mathcal{S}, \mathcal{A}, T, r, \gamma), \text{ threshold } \theta \\\\
+& \textbf{Output: } \text{Optimal value function } V^{\ast}, \text{ optimal policy } \pi^{\ast} \\\\[4pt]
+& 1.\quad V(s) \leftarrow 0 \;\;\forall\, s \in \mathcal{S} \\\\
+& 2.\quad \textbf{repeat:} \\\\
+& 3.\quad \qquad \delta \leftarrow 0 \\\\
+& 4.\quad \qquad \textbf{for each } s \in \mathcal{S}: \\\\
+& 5.\quad \qquad \qquad v \leftarrow V(s) \\\\
+& 6. \quad \qquad \qquad \pi(s) \leftarrow \arg\max_{a} \big[ r(s,a) + \gamma \, V(T(s,a)) \big] \\\\
+& 7.\quad \qquad \qquad V(s) \leftarrow  r(s,\pi(s)) + \gamma \, V(T(s,\pi(s))) \\\\
+& 8.\quad \qquad \qquad \delta \leftarrow \max(\delta, \; |v - V(s)|) \\\\
+& 9.\quad \textbf{until } \delta < \theta \\\\[4pt]
 & 10. \quad \textbf{return} \; V, \; \pi
 \end{aligned}
 }$$
@@ -156,22 +156,22 @@ Policy Iteration (PI) alternates between two phases: **policy evaluation** (comp
 
 $$\boxed{
 \begin{aligned}
-& \textbf{Algorithm: Policy Iteration} \\[4pt]
-& \textbf{Input: } \text{MDP } (\mathcal{S}, \mathcal{A}, T, r, \gamma), \text{ threshold } \theta \\
-& \textbf{Output: } \text{Optimal value function } V^{\ast}, \text{ optimal policy } \pi^{\ast} \\[4pt]
-& 1.\quad \pi(s) \leftarrow \text{arbitrary action} \;\;\forall\, s \in \mathcal{S} \\
-& 2.\quad \textbf{repeat:} \\[2pt]
-& \quad\quad \textbf{Policy Evaluation:} \\
-& 3.\quad \qquad \textbf{repeat:} \\
-& 4.\quad \qquad \qquad \delta \leftarrow 0 \\
-& 5.\quad \qquad \qquad \textbf{for each } s \in \mathcal{S}: \\
-& 6.\quad \qquad \qquad \qquad v \leftarrow V(s) \\
-& 7.\quad \qquad \qquad \qquad V(s) \leftarrow r(s, \pi(s)) + \gamma \, V(T(s, \pi(s))) \\
-& 8.\quad \qquad \qquad \qquad \delta \leftarrow \max(\delta, \; |v - V(s)|) \\
-& 9.\quad \qquad \textbf{until } \delta < \theta \\[2pt]
-& \quad\quad \textbf{Policy Improvement:} \\
-& 10.\quad \qquad \pi_{\text{new}}(s) \leftarrow \arg\max_{a} \big[ r(s,a) + \gamma \, V(T(s,a)) \big] \;\;\forall\, s \\
-& 11.\quad \textbf{until } \pi_{\text{new}} = \pi \\
+& \textbf{Algorithm: Policy Iteration} \\\\[4pt]
+& \textbf{Input: } \text{MDP } (\mathcal{S}, \mathcal{A}, T, r, \gamma), \text{ threshold } \theta \\\\
+& \textbf{Output: } \text{Optimal value function } V^{\ast}, \text{ optimal policy } \pi^{\ast} \\\\[4pt]
+& 1.\quad \pi(s) \leftarrow \text{arbitrary action} \;\;\forall\, s \in \mathcal{S} \\\\
+& 2.\quad \textbf{repeat:} \\\\[2pt]
+& \quad\quad \textbf{Policy Evaluation:} \\\\
+& 3.\quad \qquad \textbf{repeat:} \\\\
+& 4.\quad \qquad \qquad \delta \leftarrow 0 \\\\
+& 5.\quad \qquad \qquad \textbf{for each } s \in \mathcal{S}: \\\\
+& 6.\quad \qquad \qquad \qquad v \leftarrow V(s) \\\\
+& 7.\quad \qquad \qquad \qquad V(s) \leftarrow r(s, \pi(s)) + \gamma \, V(T(s, \pi(s))) \\\\
+& 8.\quad \qquad \qquad \qquad \delta \leftarrow \max(\delta, \; |v - V(s)|) \\\\
+& 9.\quad \qquad \textbf{until } \delta < \theta \\\\[2pt]
+& \quad\quad \textbf{Policy Improvement:} \\\\
+& 10.\quad \qquad \pi_{\text{new}}(s) \leftarrow \arg\max_{a} \big[ r(s,a) + \gamma \, V(T(s,a)) \big] \;\;\forall\, s \\\\
+& 11.\quad \textbf{until } \pi_{\text{new}} = \pi \\\\
 & 12.\quad \text{return } V, \; \pi
 \end{aligned}
 }$$
