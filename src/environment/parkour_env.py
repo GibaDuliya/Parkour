@@ -78,9 +78,9 @@ class ParkourEnv:
                             self.T[state][action] = (state, 0)
                             continue
 
-                        # (1) Dead -> self-loop, reward death
+                        # (1) Dead -> absorbing state, no further reward
                         if hp <= 0:
-                            self.T[state][action] = (state, rd)
+                            self.T[state][action] = (state, 0)
                             continue
 
                         # (2) Out of bounds -> self-loop, step penalty

@@ -53,13 +53,19 @@ def _plot_mean_std(ax, arrays: list[np.ndarray], color: str, label_prefix: str,
                    normalize: bool = False) -> None:
     """Plot mean ± 1 std over a list of 1-D arrays (possibly different lengths).
 
-    Truncates to the shortest array so all runs are aligned.
+    Pads shorter arrays with their last value so all runs are aligned to the longest.
     If normalize=True, each array is min-max normalized to [0, 1] before averaging.
     """
-    min_len = min(len(a) for a in arrays)
-    processed = [_normalize(a[:min_len]) if normalize else a[:min_len] for a in arrays]
-    mat = np.stack(processed, axis=0)  # [n_runs, min_len]
-    iters = np.arange(1, min_len + 1)
+    max_len = max(len(a) for a in arrays)
+
+    def _pad(a: np.ndarray) -> np.ndarray:
+        if len(a) == max_len:
+            return a
+        return np.concatenate([a, np.full(max_len - len(a), a[-1])])
+
+    processed = [_normalize(_pad(a)) if normalize else _pad(a) for a in arrays]
+    mat = np.stack(processed, axis=0)  # [n_runs, max_len]
+    iters = np.arange(1, max_len + 1)
     mean = mat.mean(axis=0)
     std = mat.std(axis=0)
     ax.plot(iters, mean, color=color, linewidth=2,
@@ -67,67 +73,75 @@ def _plot_mean_std(ax, arrays: list[np.ndarray], color: str, label_prefix: str,
     ax.fill_between(iters, mean - std, mean + std, alpha=0.3, color=color, label="± 1 std")
 
 
-def plot_training_curves(
+
+def plot_returns_only(
     algorithm_name: str,
     return_matrices: list[np.ndarray],
-    delta_arrays: list[np.ndarray],
-    save_path: Path | None = None,
+    normalize: bool,
+    save_path: Path,
 ) -> None:
-    has_returns = bool(return_matrices)
-    has_deltas = bool(delta_arrays)
-    n_plots = int(has_returns) + int(has_deltas)
-    if n_plots == 0:
-        print("Nothing to plot.")
+    if not return_matrices:
+        print("No return data to plot.")
         return
 
-    fig, axes = plt.subplots(1, n_plots, figsize=(7 * n_plots, 4))
-    if n_plots == 1:
-        axes = [axes]
-
-    idx = 0
-    if has_returns:
-        # Mean over eval cells per run → list of [n_eval_iters] arrays
-        run_means = [m.mean(axis=1) for m in return_matrices]
-        _plot_mean_std(axes[idx], run_means, color="steelblue",
-                       label_prefix="return", normalize=False)
-        axes[idx].set_xlabel("Iteration")
-        axes[idx].set_ylabel("Mean discounted return")
-        axes[idx].set_title(f"Training returns — {algorithm_name}")
-        axes[idx].legend(fontsize=8)
-        axes[idx].grid(True, alpha=0.3)
-        idx += 1
-
-    if has_deltas:
-        _plot_mean_std(axes[idx], delta_arrays, color="tomato",
-                       label_prefix="delta", normalize=False)
-        axes[idx].set_xlabel("Iteration")
-        axes[idx].set_ylabel("Max |V_new - V_old|")
-        axes[idx].set_title(f"Convergence — {algorithm_name}")
-        axes[idx].legend(fontsize=8)
-        axes[idx].grid(True, alpha=0.3)
-        idx += 1
-
-    plt.tight_layout()
-    if save_path:
-        fig.savefig(save_path, dpi=150, bbox_inches="tight")
-        print(f"Saved to {save_path}")
+    run_means = [m.mean(axis=1) for m in return_matrices]
+    fig, ax = plt.subplots(figsize=(7, 4))
+    _plot_mean_std(ax, run_means, color="steelblue",
+                   label_prefix="return", normalize=normalize)
+    ax.set_xlabel("Iteration")
+    if normalize:
+        ax.set_ylabel("Normalized return [0, 1]")
+        ax.set_title(f"Training returns (normalized) — {algorithm_name}")
     else:
-        plt.show()
+        ax.set_ylabel("Mean discounted return")
+        ax.set_title(f"Training returns — {algorithm_name}")
+    ax.legend(fontsize=8)
+    ax.grid(True, alpha=0.3)
+    plt.tight_layout()
+    fig.savefig(save_path, dpi=150, bbox_inches="tight")
     plt.close(fig)
+    print(f"Saved to {save_path}")
+
+
+def plot_convergence_only(
+    algorithm_name: str,
+    delta_arrays: list[np.ndarray],
+    save_path: Path,
+) -> None:
+    if not delta_arrays:
+        print("No delta data to plot.")
+        return
+
+    fig, ax = plt.subplots(figsize=(7, 4))
+    _plot_mean_std(ax, delta_arrays, color="tomato",
+                   label_prefix="delta", normalize=False)
+    ax.set_xlabel("Iteration")
+    ax.set_ylabel("Max |V_new - V_old|")
+    ax.set_title(f"Convergence — {algorithm_name}")
+    ax.legend(fontsize=8)
+    ax.grid(True, alpha=0.3)
+    plt.tight_layout()
+    fig.savefig(save_path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    print(f"Saved to {save_path}")
 
 
 def main():
     parser = argparse.ArgumentParser(description="Plot training curves across agent runs")
     parser.add_argument("algorithm", help="Algorithm name (e.g. value_iteration)")
-    parser.add_argument("--save", type=Path, default=None, help="Path to save the figure")
     args = parser.parse_args()
 
     return_matrices, delta_arrays = load_runs(args.algorithm)
     print(f"Loaded {len(return_matrices)} return runs, {len(delta_arrays)} delta runs "
           f"for '{args.algorithm}'")
 
-    save_path = args.save or PROJECT_ROOT / "agents" / args.algorithm / "training_curves.png"
-    plot_training_curves(args.algorithm, return_matrices, delta_arrays, save_path=save_path)
+    out_dir = PROJECT_ROOT / "agents" / args.algorithm
+    plot_returns_only(args.algorithm, return_matrices, normalize=False,
+                      save_path=out_dir / "training_returns_absolute.png")
+    plot_returns_only(args.algorithm, return_matrices, normalize=True,
+                      save_path=out_dir / "training_returns_normalized.png")
+    plot_convergence_only(args.algorithm, delta_arrays,
+                          save_path=out_dir / "training_convergence.png")
 
 
 if __name__ == "__main__":
