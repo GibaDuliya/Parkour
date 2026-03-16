@@ -33,3 +33,4 @@ results/
 plots/
 landscape/
 *.png
+*.json
