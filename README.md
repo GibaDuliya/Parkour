@@ -325,6 +325,7 @@ As we can see from this table, VI and PI agents always win the game, as well as 
 Also, we decided to check whether our results will remain stable when agents start their episode with not-minimum hp, but with some surplus. So, we increased hp for each starting point by 30%. 
 
 ```
+ FINAL AGGREGATED RESULTS (Averaged across all maps and starting cells) +30% starting hp 
 ================================================================================
 Agent Name                   | Total SR   | Avg Steps  | Avg Reward
 --------------------------------------------------------------------------------
