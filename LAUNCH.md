@@ -1,12 +1,12 @@
-# 🏃 Parkour RL: Deployment & Execution Guide
+# Parkour RL: Deployment & Execution Guide
 
-Этот гид содержит полные инструкции по настройке окружения через Docker и запуску экспериментов по обучению агентов (Value Iteration, Policy Iteration) и их сравнению с бейзлайнами в мире "Паркура".
+This guide provides complete instructions for setting up the environment via Docker and running reinforcement learning experiments (Value Iteration, Policy Iteration) and comparing them with baselines in the "Parkour" environment.
 
 ---
 
-## 📋 Предварительные требования
+## Prerequisites
 
-Перед началом убедитесь, что у вас установлены:
+Before starting, ensure you have the following installed:
 - **Docker**
 - **Git**
 
@@ -15,103 +15,103 @@ git clone git@github.com:GibaDuliya/Parkour.git
 ```
 
 ---
-## 🐳 Шаг 1: Настройка Docker-окружения
+## Step 1: Docker Environment Setup
 
-### 1.1 Конфигурация доступа
-Файл `credentials` сопоставляет ваш локальный ID пользователя с контейнером, чтобы избежать проблем с правами доступа к файлам. Проверьте его содержимое:
+### 1.1 Access Configuration
+The `credentials` file maps your local user ID to the container to prevent file permission issues. Verify its content:
 ```bash
 cat credentials
 ```
 
-### 1.2 Сборка образа
-Соберите легковесный Docker-образ (сборка занимает 1-2 минуты):
+### 1.2 Build the Image
+Build the lightweight Docker image (this takes 1-2 minutes):
 ```bash
 chmod +x build.sh
 ./build.sh
 ```
 
-### 1.3 Запуск контейнера
-Запустите контейнер. Скрипт примонтирует текущую директорию к `/app` внутри контейнера:
+### 1.3 Launch the Container
+Start the container. The script mounts the current directory to `/app` inside the container:
 ```bash
 chmod +x launch_container.sh
 ./launch_container.sh
 ```
-*После запуска вы будете автоматически перенаправлены в bash-терминал контейнера.*
+*Once launched, you will be automatically redirected to the container bash terminal.*
 
 ---
 
-## 🗺 Шаг 2: Генерация ландшафтов
+## Step 2: Landscape Generation
 
-Прежде чем обучать агентов, нужно создать карты (ландшафты). Скрипт генерирует только проходимые карты, где цель достижима.
+Before training agents, you must generate maps (landscapes). The script generates only traversable maps where the target is reachable.
 
-Внутри терминала контейнера выполните:
+Inside the container terminal, execute:
 ```bash
-# Сгенерировать 10 валидных ландшафтов (100x100)
+# Generate 10 valid landscapes (100x100)
 chmod +x ./scripts/generate_landscapes.sh  
 ./scripts/generate_landscapes.sh 10
 ```
-**Результат:** В папке `landscape/` появятся директории `landscape_1`, `landscape_2` и т.д., содержащие карты высот (`height_map.npy`) и точки спавна (`eval_cells.npy`).
+**Result:** Directories `landscape_1`, `landscape_2`, etc., will appear in the `landscape/` folder, containing height maps (`height_map.npy`) and spawn points (`eval_cells.npy`).
 
 ---
 
-## 🧠 Шаг 3: Обучение RL агентов
+## Step 3: Training RL Agents
 
-Теперь обучим алгоритмы Динамического Программирования на всех сгенерированных картах. конфиги в /configs
+Now, train the Dynamic Programming algorithms on all generated maps. Configuration files are located in `/configs`.
 
-### Вариант А: Массовое обучение (рекомендуется)
-Обучите выбранный алгоритм сразу на всех созданных ландшафтах:
+### Option A: Batch Training (Recommended)
+Train the chosen algorithm on all generated landscapes:
 ```bash
 chmod +x ./scripts/train_all_landscapes.sh
 
-# Обучение Value Iteration
+# Train Value Iteration
 ./scripts/train_all_landscapes.sh value_iteration
 
-# Обучение Policy Iteration
+# Train Policy Iteration
 ./scripts/train_all_landscapes.sh policy_iteration
 ```
 
-### Вариант Б: Ручное обучение одной карты
+### Option B: Manual Single-Map Training
 ```bash
 python run/train.py value_iteration --landscape_id 1
 ```
-**Результат:** Обученные политики и графики сходимости сохраняются в `agents/{algorithm_name}/{timestamp}/`.
+**Result:** Trained policies and convergence plots are saved in `agents/{algorithm_name}/{timestamp}/`.
 
 ---
 
-## 📊 Шаг 4: Сравнение методов и получение таблицы
+##  Step 4: Method Comparison and Table Generation
 
-Это финальный этап, который сравнивает обученные модели с эвристическими бейзлайнами (**Random, Safest Path, Shortest Path, Budget Greedy**) на одних и тех же картах и точках.
+This final stage compares the trained models against heuristic baselines (**Random, Safest Path, Shortest Path, Budget Greedy**) on the same maps and start points.
 
-Выполните:
+Execute:
 ```bash
 python run/compare.py
 ```
 
-**Что вы получите:**
-1.  **Таблицу в консоли** с Success Rate, Avg Steps и Avg Reward для каждого метода.
-2.  **Лог-файл** в корне проекта: `compare_results_YYYY-MM-DD.txt`.
+**What you will get:**
+1.  **Console table** showing Success Rate, Avg Steps, and Avg Reward for each method.
+2.  **Log file** in the project root: `compare_results_YYYY-MM-DD.txt`.
 
-*Примечание: Параметр `hp_start` в `configs/env.yaml` определяет запас здоровья для всех агентов в этом тесте.*
-
----
-
-## 🔬 Шаг 5: Дополнительные эксперименты и Jupyter
-
-При запуске `./launch_container.sh` автоматически стартует Jupyter-сервер на порту **8890**.
-1.  Откройте браузер: `http://localhost:8890`
-2.  Перейдите в папку `experiments/`.
-3.  Там вы найдете ноутбуки для интерактивной визуализации карт, проигрывания траекторий и детального анализа Value Function.
+*Note: The `hp_start` parameter in `configs/env.yaml` defines the health points for all agents in this test.*
 
 ---
 
-## 📂 Структура проекта (кратко)
+##  Step 5: Additional Experiments and Jupyter
 
--   `src/environment/`: Окружение ParkourEnv (логика HP, падений и наград).
--   `src/algorithms/`: Реализации VI, PI и `baselines.py`.
--   `landscape/`: Сгенерированные миры и точки оценки.
--   `agents/`: Хранилище обученных моделей и их метрик.
--   `run/`: Скрипты для запуска обучения, сравнения и визуализации.
--   `configs/`: YAML настройки для среды и алгоритмов.
+When running `./launch_container.sh`, a Jupyter server automatically starts on port **8890**.
+1. Open your browser: `http://localhost:8890`
+2. Navigate to the `experiments/` directory.
+3. You will find notebooks for interactive map visualization, trajectory playback, and detailed Value Function analysis.
 
 ---
-**Удачного паркура!** 🏃‍♂️🏢
+
+## Project Structure (Summary)
+
+-   `src/environment/`: ParkourEnv logic (HP, falls, and rewards).
+-   `src/algorithms/`: Implementations of VI, PI, and `baselines.py`.
+-   `landscape/`: Generated worlds and evaluation points.
+-   `agents/`: Storage for trained models and metrics.
+-   `run/`: Scripts for training, comparison, and visualization.
+-   `configs/`: YAML settings for the environment and algorithms.
+
+---
+**Happy Parkouring!**
