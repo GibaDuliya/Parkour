@@ -48,6 +48,10 @@ class ParkourEnv:
             self.max_jump_up = int(landscape_cfg["max_jump_up"])
             self.safe_jump_down = int(landscape_cfg["safe_jump_down"])
 
+        # Optional stochasticity parameters (do not affect DP tables)
+        # Zero by default to keep original deterministic behaviour.
+        self.reward_noise_std: float = float(env_config.get("reward_noise_std", 0.0))
+
         # Build transition table: T[(i, j, hp)][action] = ((i', j', hp'), reward)
         self.T: dict = {}
         self._build_transition_table()
@@ -127,6 +131,12 @@ class ParkourEnv:
             - dead: bool — True if agent died
         """
         next_state, reward = self.T[state][action]
+
+        # Add zero-mean Gaussian noise to the reward at rollout time only.
+        # This keeps the optimal policy (based on the expectation) the same,
+        # while producing stochastic trajectories.
+        if self.reward_noise_std > 0.0:
+            reward = float(reward + np.random.normal(0.0, self.reward_noise_std))
         i2, j2, hp2 = next_state
         goal = (self.rows - 1, self.cols - 1)
         dead = hp2 <= 0

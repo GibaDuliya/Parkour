@@ -1,6 +1,6 @@
-seed: 4
+seed: 8
 grid_size: 30
 min_building_height: 1
-max_building_height: 10
+max_building_height: 15
 max_jump_up: 3
-safe_jump_down: 1
+safe_jump_down: 2

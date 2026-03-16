@@ -1,0 +1,4 @@
+algorithm: q_learning_value_iteration
+landscape_id: 3
+n_actions: 4
+n_states: 14400
