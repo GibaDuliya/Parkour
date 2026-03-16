@@ -79,7 +79,7 @@ This guarantees solvability while keeping the HP constraint tight — the agent 
 <p align="center">
   <img src="./readme_nec/min_hp_map.jpg" alt="Minimum HP map" width="600"/>
   <br/>
-  <em>Minimum HP map. In each cell on the grid we compute the minimum start hp for an agent to go to the finish cell (N-1, N-1). The closer to the finish (right-down corner), the less hp an agent needs to achieve the target. </em>
+  <em>Minimum HP map. In each cell on the grid we compute the minimum start hp for an agent to go to the finish cell (N-1, N-1). The closer to the finish (right-down corner), the less hp an agent needs to achieve the target. White cells indicate zones from which the final cell is unreachable with any starting hp.   </em>
 </p>
 
 ---
