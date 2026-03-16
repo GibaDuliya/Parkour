@@ -38,7 +38,7 @@ def plot_height_map(height_map: np.ndarray, save_path: str | Path | None = None)
     plt.tight_layout()
     if save_path:
         fig.savefig(save_path, dpi=150, bbox_inches="tight")
-    plt.show()
+    plt.close(fig)
 
 
 def plot_value_function(
@@ -81,7 +81,7 @@ def plot_value_function(
     plt.tight_layout()
     if save_path:
         fig.savefig(save_path, dpi=150, bbox_inches="tight")
-    plt.show()
+    plt.close(fig)
 
 
 def plot_policy(
@@ -143,7 +143,7 @@ def plot_policy(
     plt.tight_layout()
     if save_path:
         fig.savefig(save_path, dpi=150, bbox_inches="tight")
-    plt.show()
+    plt.close(fig)
 
 
 def plot_trajectory(trajectory: list, height_map: np.ndarray, save_path: str | Path | None = None) -> None:
@@ -168,7 +168,7 @@ def plot_trajectory(trajectory: list, height_map: np.ndarray, save_path: str | P
     plt.tight_layout()
     if save_path:
         fig.savefig(save_path, dpi=150, bbox_inches="tight")
-    plt.show()
+    plt.close(fig)
 
 
 def plot_convergence(info: dict, save_path: str | Path | None = None) -> None:
@@ -185,4 +185,4 @@ def plot_convergence(info: dict, save_path: str | Path | None = None) -> None:
     plt.tight_layout()
     if save_path:
         fig.savefig(save_path, dpi=150, bbox_inches="tight")
-    plt.show()
+    plt.close(fig)

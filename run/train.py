@@ -32,7 +32,7 @@ def load_yaml(path: str) -> dict:
 
 
 def main(algorithm_name: str):
-    """Run a single experiment.
+    """Train an agent and save value function + policy.
 
     Args:
         algorithm_name: key from ALGORITHMS dict
@@ -73,33 +73,49 @@ def main(algorithm_name: str):
         f"victory: {rollout['victory']}"
     )
 
-    # 6. Visualization — save to plots/{date_time}/
+    # 6. Save agent artifacts to agents/{date_time}/
     run_date = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    out_dir = PROJECT_ROOT / "plots" / run_date
-    out_dir.mkdir(parents=True, exist_ok=True)
-    print(f"Plots will be saved to: {out_dir}")
+    agent_dir = PROJECT_ROOT / "agents" / run_date
+    agent_dir.mkdir(parents=True, exist_ok=True)
 
-    plot_height_map(env.height_map, save_path=out_dir / "height_map.png")
+    np.save(agent_dir / "value_function.npy", V)
+    np.save(agent_dir / "policy.npy", policy)
+    np.save(agent_dir / "states.npy", np.array(algo.states))
+
+    # Save metadata so evaluate.py knows which landscape/algorithm was used
+    meta = {
+        "algorithm": algorithm_name,
+        "landscape_id": env_config["landscape_id"],
+        "n_states": int(algo.n_states),
+        "n_actions": int(algo.n_actions),
+    }
+    with open(agent_dir / "meta.yaml", "w") as f:
+        yaml.dump(meta, f)
+
+    # 7. Visualization — save alongside agent artifacts
+    plot_height_map(env.height_map, save_path=agent_dir / "height_map.png")
     plot_value_function(
         V, env.height_map, min_hp_map, algo._state_to_id,
-        save_path=out_dir / "value_function.png",
+        save_path=agent_dir / "value_function.png",
     )
     plot_policy(
         policy, env.height_map, env.hp_start, algo._state_to_id, algo.actions,
-        save_path=out_dir / "policy.png",
+        save_path=agent_dir / "policy.png",
     )
-    plot_trajectory(rollout["trajectory"], env.height_map, save_path=out_dir / "trajectory.png")
-    plot_convergence(info, save_path=out_dir / "convergence.png")
+    plot_trajectory(rollout["trajectory"], env.height_map, save_path=agent_dir / "trajectory.png")
+    plot_convergence(info, save_path=agent_dir / "convergence.png")
+
+    print(f"Agent saved to: {agent_dir}")
 
 
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(description="Parkour RL — Dynamic Programming")
+    parser = argparse.ArgumentParser(description="Parkour RL — Train agent")
     parser.add_argument(
         "algorithm",
         choices=list(ALGORITHMS.keys()),
-        help="Algorithm to run",
+        help="Algorithm to train",
     )
     args = parser.parse_args()
     main(args.algorithm)
