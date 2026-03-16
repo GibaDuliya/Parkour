@@ -262,7 +262,6 @@ The procedure is as follows:
 1. Generate several random maps of size $100 \times 100$.
 2. For each map, fix the starting cell at $(0, 0)$ and vary $\text{hp}_{\text{start}}$ over a range of values.
 3. For each $\text{hp}_{\text{start}}$, run VI (or PI) to obtain the optimal policy, then roll it out and record the resulting path length.
-4. Average across maps for each $\text{hp}_{\text{start}}$ value.
 
 <p align="center">
   <img src="./readme_nec/LPATH_HP.jpg" alt="Optimal path length vs starting HP" width="600"/>
