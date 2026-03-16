@@ -98,7 +98,7 @@ $$\boxed{
 & 1.\quad \text{Initialize } d[v] \leftarrow \infty \;\forall\, v \in V;\quad d[s] \leftarrow 0 \\
 & 2.\quad \text{Priority queue } Q \leftarrow \{(0, s)\} \\
 & 3.\quad \textbf{while } Q \neq \emptyset: \\
-& 4.\quad \qquad (c, u) \leftarrow Q.\operatorname{pop\_min}() \\
+& 4.\quad \qquad (c, u) \leftarrow Q.\text{pop\_min}() \\
 & 5.\quad \qquad \textbf{if } u = g: \text{ return } (d[g],\; P) \\
 & 6.\quad \qquad \textbf{for } (v, w_{uv}) \in \text{neighbors}(u): \\
 & 7.\quad \qquad \qquad \textbf{if } d[u] + w_{uv} < d[v]: \\
@@ -119,7 +119,7 @@ $$\boxed{
 \begin{aligned}
 & \textbf{Algorithm: Value Iteration} \\[4pt]
 & \textbf{Input: } \text{MDP } (\mathcal{S}, \mathcal{A}, T, r, \gamma), \text{ threshold } \theta \\
-& \textbf{Output: } \text{Optimal value function } V^{*}, \text{ optimal policy } \pi^{*} \\[4pt]
+& \textbf{Output: } \text{Optimal value function } V^{\ast}, \text{ optimal policy } \pi^{\ast} \\[4pt]
 & 1.\quad V(s) \leftarrow 0 \;\;\forall\, s \in \mathcal{S} \\
 & 2.\quad \textbf{repeat:} \\
 & 3.\quad \qquad \delta \leftarrow 0 \\
@@ -135,7 +135,7 @@ $$\boxed{
 
 **Convergence.** Value Iteration is guaranteed to converge because the Bellman optimality operator is a $\gamma$-contraction in the $\|\cdot\|_\infty$ norm. At each iteration the error decreases by at least a factor of $\gamma$:
 
-$$\|V_{k+1} - V^{*}\|_\infty \;\leq\; \gamma\,\|V_k - V^{*}\|_\infty$$
+$$\|V_{k+1} - V^{\ast}\|_\infty \;\leq\; \gamma\,\|V_k - V^{\ast}\|_\infty$$
 
 Hence convergence is geometric with rate $\gamma$. In practice, with $\gamma = 0.99$ and threshold $\theta = 10^{-6}$, VI converges within several hundred iterations.
 
@@ -145,7 +145,7 @@ Hence convergence is geometric with rate $\gamma$. In practice, with $\gamma = 0
 </p>
 
 **Plot description:**
-The plot shows $\|V_{k+1} - V_k\|_\infty$ decreasing monotonically towards zero with each iteration, confirming convergence. Since the Bellman optimality operator is a $\gamma$-contraction, this guarantees that $V_k \to V^{*}$. Note, however, that a small $\|V_{k+1} - V_k\|_\infty$ does not tell us the exact iteration at which the derived policy $\pi_k$ becomes optimal — the value function may still be refining while the policy has already stabilized.
+The plot shows $\|V_{k+1} - V_k\|_\infty$ decreasing monotonically towards zero with each iteration, confirming convergence. Since the Bellman optimality operator is a $\gamma$-contraction, this guarantees that $V_k \to V^{\ast}$. Note, however, that a small $\|V_{k+1} - V_k\|_\infty$ does not tell us the exact iteration at which the derived policy $\pi_k$ becomes optimal — the value function may still be refining while the policy has already stabilized.
 
 
 ### 2.3 Policy Iteration
@@ -156,7 +156,7 @@ $$\boxed{
 \begin{aligned}
 & \textbf{Algorithm: Policy Iteration} \\[4pt]
 & \textbf{Input: } \text{MDP } (\mathcal{S}, \mathcal{A}, T, r, \gamma), \text{ threshold } \theta \\
-& \textbf{Output: } \text{Optimal value function } V^{*}, \text{ optimal policy } \pi^{*} \\[4pt]
+& \textbf{Output: } \text{Optimal value function } V^{\ast}, \text{ optimal policy } \pi^{\ast} \\[4pt]
 & 1.\quad \pi(s) \leftarrow \text{arbitrary action} \;\;\forall\, s \in \mathcal{S} \\
 & 2.\quad \textbf{repeat:} \\[2pt]
 & \quad\quad \textbf{Policy Evaluation:} \\
