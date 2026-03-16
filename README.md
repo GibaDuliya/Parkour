@@ -98,7 +98,7 @@ $$\boxed{
 & 1.\quad \text{Initialize } d[v] \leftarrow \infty \;\forall\, v \in V;\quad d[s] \leftarrow 0 \\
 & 2.\quad \text{Priority queue } Q \leftarrow \{(0, s)\} \\
 & 3.\quad \textbf{while } Q \neq \emptyset: \\
-& 4.\quad \qquad (c, u) \leftarrow Q.\text{pop\_min}() \\
+& 4.\quad \qquad (c, u) \leftarrow Q.\text{pop\\_min}() \\
 & 5.\quad \qquad \textbf{if } u = g: \text{ return } (d[g],\; P) \\
 & 6.\quad \qquad \textbf{for } (v, w_{uv}) \in \text{neighbors}(u): \\
 & 7.\quad \qquad \qquad \textbf{if } d[u] + w_{uv} < d[v]: \\
