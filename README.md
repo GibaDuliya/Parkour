@@ -8,6 +8,8 @@ The agent starts at some random start cell $(i_{\text{start}}, j_{\text{start}})
 
 <p align="center">
   <img src="./readme_nec/gameplay.gif" alt="Agent traversing the parkour grid" width="600"/>
+</p>
+<p align="center">
   <em> The sample of the playing of the agent according to the learned optimal policy through Policy Iteration algorithm. </em>
 </p>
 
@@ -278,7 +280,7 @@ The procedure is as follows:
 This project implements and compares two classical dynamic programming algorithms — **Value Iteration** and **Policy Iteration** — on the Parkour grid-world environment, where an agent must navigate an $N \times N$ grid of buildings with varying heights while managing limited health points.
 
 **Environment design:**
-- Dijkstra's algorithm is used both to validate landscape solvability and to calibrate the starting HP ($\text{hp}_{\text{start}} = \text{cost}_{\min} + 1$), ensuring a tight but feasible constraint.
+- Dijkstra's algorithm is used both to validate landscape solvability and to calibrate the starting HP ($\text{hp}\_{\text{start}} = \text{cost}\_{\min} + 1$), ensuring a tight but feasible constraint.
 - The minimum HP map visualization confirms that cells closer to the goal require less health, as expected.
 
 **Algorithm convergence:**
