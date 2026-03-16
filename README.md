@@ -52,7 +52,7 @@ Jumping up or sideways costs 0 HP; jumping down by 1 costs 0 HP; jumping down by
 
 The full transition function:
 
-$$T(s, a) = \begin{cases} s & \text{if } \text{hp} \leq 0 \quad \text{(dead)} \ \text{or if $(i, j) = (N - 1, N -1)$}  \\ s & \text{if } (i',j') \text{ out of bounds} \\ s & \text{if } \Delta h > 3 \quad \text{(jump too high)} \\ (i',\; j',\; \text{hp} - \text{damage}) & \text{otherwise} \end{cases}$$
+$$T(s, a) = \begin{cases} s & \text{if } \text{hp} \leq 0 \quad \text{(dead)} \ \text{or if } (i, j) = (N - 1, N - 1)  \\ s & \text{if } (i',j') \text{ out of bounds} \\ s & \text{if } \Delta h > 3 \quad \text{(jump too high)} \\ (i',\; j',\; \text{hp} - \text{damage}) & \text{otherwise} \end{cases}$$
 
 **Terminal states** (absorbing, no further transitions):
 - **Victory:** agent reaches $(N{-}1,\, N{-}1)$ with $\text{hp} > 0$
@@ -61,7 +61,7 @@ $$T(s, a) = \begin{cases} s & \text{if } \text{hp} \leq 0 \quad \text{(dead)} \ 
 ### Reward Function
 
 $$r(s, a) = \begin{cases} -100 & \text{if } \text{hp}' \leq 0 \ \text{and hp} > 0 \quad \text{(death - agent die bacause of the move)} \\ +100 & \text{if }(i, j) \neq (N{-}1,\, N{-}1),\ (i', j') = (N{-}1,\, N{-}1) \text{ and } \text{hp}' > 0 \quad \text{(victory)} \\
- 0 &  \text{if hp $\le$ 0} \ \text{or if $(i, j) = (N - 1, N -1)$} \\
+ 0 &  \text{if hp } \leq 0 \ \text{or if } (i, j) = (N - 1, N - 1) \\
  -1 & \text{otherwise} \quad \text{(step penalty)} \end{cases}$$
 
 > **Note:** Death is checked before victory. If the agent jumps onto the goal cell but $\text{hp}' \leq 0$, the outcome is death.
@@ -86,7 +86,7 @@ This guarantees solvability while keeping the HP constraint tight — the agent 
 
 ### 2.1 Dijkstra's Algorithm
 
-We use Dijkstra's algorithm to find the **minimum-damage path** from a given cell $(i_0, j_0)$ to the goal cell $(N{-}1,\, N{-}1)$. To do this we define a grapgh, where vertices are just grid cells (not states of the environment !) and edge weights represent fall damage. More precisely: $$w\big((i,j) \to (i',j')\big) = \max\!\big(0,\; h_{ij} - h_{i'j'} - 1\big), \quad \text{and edge absent if (because of impossibility to jump too high) } \Delta h > 3$$
+We use Dijkstra's algorithm to find the **minimum-damage path** from a given cell $(i_0, j_0)$ to the goal cell $(N{-}1,\, N{-}1)$. To do this we define a graph, where vertices are just grid cells (not states of the environment !) and edge weights represent fall damage. More precisely: $$w\big((i,j) \to (i',j')\big) = \max\!\big(0,\; h_{ij} - h_{i'j'} - 1\big), \quad \text{and edge absent if (because of impossibility to jump too high) } \Delta h > 3$$
 
 This serves two purposes: (1) validating that a generated landscape is solvable, and (2) calibrating the agent's starting HP.
 
@@ -98,7 +98,7 @@ $$\boxed{
 & 1.\quad \text{Initialize } d[v] \leftarrow \infty \;\forall\, v \in V;\quad d[s] \leftarrow 0 \\
 & 2.\quad \text{Priority queue } Q \leftarrow \{(0, s)\} \\
 & 3.\quad \textbf{while } Q \neq \emptyset: \\
-& 4.\quad \qquad (c, u) \leftarrow Q.\text{pop\_min}() \\
+& 4.\quad \qquad (c, u) \leftarrow Q.\operatorname{pop\_min}() \\
 & 5.\quad \qquad \textbf{if } u = g: \text{ return } (d[g],\; P) \\
 & 6.\quad \qquad \textbf{for } (v, w_{uv}) \in \text{neighbors}(u): \\
 & 7.\quad \qquad \qquad \textbf{if } d[u] + w_{uv} < d[v]: \\
@@ -113,13 +113,13 @@ $$\boxed{
 
 Value Iteration (VI) computes the optimal value function by iteratively applying the **Bellman optimality equation** until convergence. In our deterministic setting the update simplifies to:
 
-$$V_{k+1}(s) = \max_{a \in \mathcal{A}} \Big[ r(s, a) + \gamma \, V_k\!\big(T(s, a)\big) \Big]$$
+$$V_{k+1}(s) = \max_{a \in \mathcal{A}} \Big[ r(s, a) + \gamma \, V_{k}\!\big(T(s, a)\big) \Big]$$
 
 $$\boxed{
 \begin{aligned}
 & \textbf{Algorithm: Value Iteration} \\[4pt]
 & \textbf{Input: } \text{MDP } (\mathcal{S}, \mathcal{A}, T, r, \gamma), \text{ threshold } \theta \\
-& \textbf{Output: } \text{Optimal value function } V^*, \text{ optimal policy } \pi^* \\[4pt]
+& \textbf{Output: } \text{Optimal value function } V^{*}, \text{ optimal policy } \pi^{*} \\[4pt]
 & 1.\quad V(s) \leftarrow 0 \;\;\forall\, s \in \mathcal{S} \\
 & 2.\quad \textbf{repeat:} \\
 & 3.\quad \qquad \delta \leftarrow 0 \\
@@ -135,7 +135,7 @@ $$\boxed{
 
 **Convergence.** Value Iteration is guaranteed to converge because the Bellman optimality operator is a $\gamma$-contraction in the $\|\cdot\|_\infty$ norm. At each iteration the error decreases by at least a factor of $\gamma$:
 
-$$\|V_{k+1} - V^*\|_\infty \;\leq\; \gamma\,\|V_k - V^*\|_\infty$$
+$$\|V_{k+1} - V^{*}\|_\infty \;\leq\; \gamma\,\|V_k - V^{*}\|_\infty$$
 
 Hence convergence is geometric with rate $\gamma$. In practice, with $\gamma = 0.99$ and threshold $\theta = 10^{-6}$, VI converges within several hundred iterations.
 
@@ -145,18 +145,18 @@ Hence convergence is geometric with rate $\gamma$. In practice, with $\gamma = 0
 </p>
 
 **Plot description:**
-The plot shows $\|V_{k+1} - V_k\|_\infty$ decreasing monotonically towards zero with each iteration, confirming convergence. Since the Bellman optimality operator is a $\gamma$-contraction, this guarantees that $V_k \to V^*$. Note, however, that a small $\|V_{k+1} - V_k\|_\infty$ does not tell us the exact iteration at which the derived policy $\pi_k$ becomes optimal — the value function may still be refining while the policy has already stabilized.
+The plot shows $\|V_{k+1} - V_k\|_\infty$ decreasing monotonically towards zero with each iteration, confirming convergence. Since the Bellman optimality operator is a $\gamma$-contraction, this guarantees that $V_k \to V^{*}$. Note, however, that a small $\|V_{k+1} - V_k\|_\infty$ does not tell us the exact iteration at which the derived policy $\pi_k$ becomes optimal — the value function may still be refining while the policy has already stabilized.
 
 
 ### 2.3 Policy Iteration
 
-Policy Iteration (PI) alternates between two phases: **policy evaluation** (computing $V^\pi$ for the current policy) and **policy improvement** (extracting a greedy policy from $V^\pi$):
+Policy Iteration (PI) alternates between two phases: **policy evaluation** (computing $V^{\pi}$ for the current policy) and **policy improvement** (extracting a greedy policy from $V^{\pi}$):
 
 $$\boxed{
 \begin{aligned}
 & \textbf{Algorithm: Policy Iteration} \\[4pt]
 & \textbf{Input: } \text{MDP } (\mathcal{S}, \mathcal{A}, T, r, \gamma), \text{ threshold } \theta \\
-& \textbf{Output: } \text{Optimal value function } V^*, \text{ optimal policy } \pi^* \\[4pt]
+& \textbf{Output: } \text{Optimal value function } V^{*}, \text{ optimal policy } \pi^{*} \\[4pt]
 & 1.\quad \pi(s) \leftarrow \text{arbitrary action} \;\;\forall\, s \in \mathcal{S} \\
 & 2.\quad \textbf{repeat:} \\[2pt]
 & \quad\quad \textbf{Policy Evaluation:} \\
@@ -174,7 +174,7 @@ $$\boxed{
 \end{aligned}
 }$$
 
-**Convergence.** Policy Iteration converges in a finite number of steps because the number of deterministic policies is finite ($|\mathcal{A}|^{|\mathcal{S}|}$) and each improvement step strictly increases the value of at least one state (or the policy is already optimal). In practice, PI often converges in very few outer iterations (typically $< 10$), though each iteration requires solving a full policy evaluation sub-problem.
+**Convergence.** Policy Iteration converges in a finite number of steps because the number of deterministic policies is finite ($|\mathcal{A}|^{|\mathcal{S}|}$) and each improvement step strictly increases the value of at least one state (or the policy is already optimal). In practice, PI often converges in very few outer iterations (typically ${<} 10$), though each iteration requires solving a full policy evaluation sub-problem.
 
 <p align="center">
   <img src="./readme_nec/PI.png" alt="Policy Iteration convergence" width="600"/>
