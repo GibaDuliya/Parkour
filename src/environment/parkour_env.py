@@ -42,8 +42,12 @@ class ParkourEnv:
             self.height_map = np.load(os.path.join(landscape_dir, "height_map.npy"))
             self.rows, self.cols = self.height_map.shape
             min_hp_map = np.load(os.path.join(landscape_dir, "min_hp.npy"))
-            self.hp_start = int(min_hp_map[min_hp_map > 0].max())  # state space bound
-            self.hp_init = int(min_hp_map[0, 0])                   # rollout starting HP
+            if "hp_start" in env_config:
+                self.hp_start = int(env_config["hp_start"])
+                self.hp_init = int(env_config.get("hp_init", self.hp_start))
+            else:
+                self.hp_start = int(min_hp_map[min_hp_map > 0].max())  # state space bound
+                self.hp_init = int(min_hp_map[0, 0])                   # rollout starting HP
             self.rewards = env_config["rewards"]
             self.max_jump_up = int(landscape_cfg["max_jump_up"])
             self.safe_jump_down = int(landscape_cfg["safe_jump_down"])

@@ -42,6 +42,8 @@ def main(algorithm_name: str, landscape_id: int | None = None):
     env_config = load_yaml("configs/env.yaml")
     if landscape_id is not None:
         env_config["landscape_id"] = landscape_id
+        # При обучении по ландшафтам: HP в каждой точке = 100 (вместо min_hp из карты)
+        env_config["hp_start"] = 100
     algo_cls, algo_config_path = ALGORITHMS[algorithm_name]
     algo_config = load_yaml(algo_config_path)
 
@@ -51,6 +53,9 @@ def main(algorithm_name: str, landscape_id: int | None = None):
     # Load landscape arrays
     landscape_dir = PROJECT_ROOT / "landscape" / f"landscape_{env_config['landscape_id']}"
     min_hp_map = np.load(landscape_dir / "min_hp.npy")
+    if landscape_id is not None:
+        # В каждой точке используем HP = 100 для eval/rollouts и визуализации
+        min_hp_map = np.full_like(min_hp_map, 100, dtype=min_hp_map.dtype)
     eval_cells_path = landscape_dir / "eval_cells.npy"
     eval_cells = [tuple(c) for c in np.load(eval_cells_path)] if eval_cells_path.exists() else None
 
